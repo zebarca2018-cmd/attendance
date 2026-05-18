@@ -6,53 +6,70 @@
   <title>Attendance & Employee Management</title>
   <style>
     /* -----------------------------------------------------------------
-       BASE STYLES & THEME
+       DARK THEME STYLES (ປັບໃຫ້ງາມຄືຮູບທີ 2)
        ----------------------------------------------------------------- */
     :root {
-      --bg-main: #f8fafc;
-      --bg-card: #ffffff;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --border: #e2e8f0;
-      --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-      
-      --c-present: #10b981;
-      --c-absent: #ef4444;
-      --c-late: #f59e0b;
+      --bg-main: #0f172a;        /* ສີພື້ນຫຼັງມືດ */
+      --bg-card: #1e293b;        /* ສີກາດ */
+      --text-main: #f8fafc;      /* ສີໜັງສືຫຼັກ */
+      --text-muted: #94a3b8;     /* ສີໜັງສືຈາງ */
+      --primary: #3b82f6;        /* ສີຫຼັກ (ປ່ຽນໄດ້ຈາກ Color Picker) */
+      --primary-hover: #2563eb;
+      --border: #334155;
+      --shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Noto Sans Lao', system-ui, -apple-system, sans-serif;
+      font-family: 'Noto Sans Lao', 'Inter', system-ui, -apple-system, sans-serif;
       background-color: var(--bg-main);
       color: var(--text-main);
-      padding-bottom: 80px; /* Space for Bottom Nav */
+      padding-bottom: 90px;
     }
 
-    /* Top Header & Lang Switcher */
+    /* Top Bar */
     .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: white;
+      background: #1e293b;
       padding: 15px 20px;
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
       z-index: 100;
     }
-    .top-bar h1 { font-size: 18px; color: var(--primary); }
+    .top-bar h1 { font-size: 18px; color: var(--primary); font-weight: 600; }
     
-    .lang-switcher { display: flex; gap: 8px; }
+    .controls-right { display: flex; align-items: center; gap: 12px; }
+    
+    /* Color Picker Style */
+    .color-picker-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .color-picker-wrapper input[type="color"] {
+      -webkit-appearance: none;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      background: none;
+    }
+    .color-picker-wrapper input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    .color-picker-wrapper input[type="color"]::-webkit-color-swatch { border: 2px solid #fff; border-radius: 50%; }
+
+    .lang-switcher { display: flex; gap: 6px; }
     .lang-btn {
-      background: #f1f5f9;
+      background: #334155;
       border: 1px solid var(--border);
+      color: var(--text-main);
       padding: 6px 12px;
       border-radius: 20px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
       transition: all 0.2s;
     }
@@ -62,7 +79,7 @@
       border-color: var(--primary);
     }
 
-    /* Container */
+    /* Main Container */
     main { max-width: 800px; margin: 20px auto; padding: 0 15px; }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
@@ -71,55 +88,104 @@
     .card {
       background: var(--bg-card);
       border-radius: 16px;
-      padding: 20px;
+      padding: 24px;
       box-shadow: var(--shadow);
       margin-bottom: 20px;
       border: 1px solid var(--border);
     }
-    .card h3 { margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+    .card h3 { margin-bottom: 20px; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--primary); }
 
     .form-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 15px;
+      gap: 18px;
     }
     .form-group { display: flex; flex-direction: column; }
-    label { margin-bottom: 6px; font-weight: 500; font-size: 14px; color: #475569; }
+    label { margin-bottom: 8px; font-weight: 500; font-size: 14px; color: var(--text-muted); }
+    
     select, input, textarea {
       width: 100%;
-      padding: 10px 12px;
+      padding: 12px;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 14px;
-      background-color: #f8fafc;
+      background-color: #0f172a;
+      color: var(--text-main);
       font-family: inherit;
+      transition: all 0.2s;
     }
-    select:focus, input:focus, textarea:focus { outline: 2px solid var(--primary); background-color: #fff; }
+    select:focus, input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
 
     .btn-submit {
       background-color: var(--primary);
       color: white;
       border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
+      padding: 14px 24px;
+      border-radius: 10px;
       font-size: 14px;
       cursor: pointer;
-      font-weight: 500;
+      font-weight: 600;
       width: 100%;
-      margin-top: 15px;
+      margin-top: 20px;
+      transition: background 0.2s;
     }
     .btn-submit:hover { background-color: var(--primary-hover); }
 
-    /* Profile Card (Modern UI) */
+    /* Dashboard Status Counters (ຄືຮູບທີ 2) */
+    .dashboard-counters {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .counter-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .counter-box h2 { font-size: 24px; margin-bottom: 4px; }
+    .counter-box p { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+    /* Lists & Items */
+    .search-box { margin-bottom: 15px; }
+    .att-item {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+    .att-details h4 { font-size: 15px; margin-bottom: 4px; font-weight: 600; }
+    .att-details p { font-size: 13px; color: var(--text-muted); }
+    
+    .badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge.Present { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge.Absent { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .badge.Late { background-color: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+
+    /* Employee Profiles */
     .employee-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 15px;
     }
     .profile-card {
-      background: white;
-      border-radius: 12px;
-      padding: 15px;
+      background: var(--bg-card);
+      border-radius: 14px;
+      padding: 16px;
       border: 1px solid var(--border);
       display: flex;
       align-items: center;
@@ -128,65 +194,40 @@
       box-shadow: var(--shadow);
     }
     .profile-img-circle {
-      width: 65px;
-      height: 65px;
+      width: 70px;
+      height: 70px;
       border-radius: 50%;
       object-fit: cover;
-      background: #e2e8f0;
-      border: 2px solid #fff;
-      box-shadow: 0 0 0 2px var(--primary);
+      background: #334155;
+      border: 2px solid var(--primary);
     }
     .profile-info { flex: 1; }
-    .profile-info h4 { font-size: 15px; margin-bottom: 4px; }
-    .profile-info p { font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
-    
-    /* Attendance List UI */
-    .search-box { margin-bottom: 15px; }
-    .att-item {
-      background: white;
-      border-radius: 12px;
-      padding: 15px;
-      border: 1px solid var(--border);
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: var(--shadow);
-    }
-    .att-details h4 { font-size: 15px; margin-bottom: 4px; }
-    .att-details p { font-size: 12px; color: var(--text-muted); }
-    
-    .badge {
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .badge.Present { background-color: #d1fae5; color: #065f46; }
-    .badge.Absent { background-color: #fee2e2; color: #991b1b; }
-    .badge.Late { background-color: #fef3c7; color: #92400e; }
+    .profile-info h4 { font-size: 15px; margin-bottom: 6px; font-weight: 600; }
+    .profile-info p { font-size: 12px; color: var(--text-muted); margin-bottom: 3px; }
 
     .btn-del-icon {
       background: none;
       border: none;
-      color: #ef4444;
+      color: #f87171;
       cursor: pointer;
       font-size: 16px;
       padding: 5px;
+      transition: transform 0.2s;
     }
+    .btn-del-icon:hover { transform: scale(1.1); }
 
-    /* 📱 BOTTOM NAVIGATION BAR */
+    /* 📱 BOTTOM NAV BAR */
     .bottom-nav {
       position: fixed;
       bottom: 0; left: 0; right: 0;
-      height: 65px;
-      background: white;
+      height: 70px;
+      background: #1e293b;
       border-top: 1px solid var(--border);
       display: flex;
       justify-content: space-around;
       align-items: center;
       z-index: 1000;
-      box-shadow: 0 -4px 10px rgba(0,0,0,0.03);
+      box-shadow: 0 -10px 20px rgba(0,0,0,0.2);
     }
     .nav-item {
       background: none;
@@ -197,20 +238,20 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       color: var(--text-muted);
       cursor: pointer;
-      font-size: 11px;
+      font-size: 12px;
       font-family: inherit;
     }
-    .nav-item span { font-size: 20px; }
+    .nav-item span { font-size: 22px; }
     .nav-item.active { color: var(--primary); font-weight: 600; }
 
     /* Loading Bar */
     .loading-bar {
       position: fixed;
       top: 0; left: 0; right: 0; height: 3px;
-      background-color: #e2e8f0; display: none; z-index: 9999;
+      background-color: #334155; display: none; z-index: 9999;
     }
     .loading-bar.active { display: block; }
     .loading-bar-inner {
@@ -224,9 +265,14 @@
 
   <div class="top-bar">
     <h1 id="ui-app-title">📅 ລະບົບຈັດການລາຍຊື່ ແລະ ເວລາມາວຽກ</h1>
-    <div class="lang-switcher">
-      <button class="lang-btn active" onclick="changeLang('lo')">🇱🇦 ລາວ</button>
-      <button class="lang-btn" onclick="changeLang('en')">🇬🇧 ENG</button>
+    <div class="controls-right">
+      <div class="color-picker-wrapper">
+        <input type="color" id="themePicker" value="#3b82f6" oninput="changeTheme(this.value)">
+      </div>
+      <div class="lang-switcher">
+        <button class="lang-btn active" onclick="changeLang('lo')">🇱🇦 ລາວ</button>
+        <button class="lang-btn" onclick="changeLang('en')">🇬🇧 ENG</button>
+      </div>
     </div>
   </div>
 
@@ -234,6 +280,22 @@
 
   <main>
     <div class="tab-panel active" id="tab0">
+      
+      <div class="dashboard-counters">
+        <div class="counter-box">
+          <h2 id="count-present">0</h2>
+          <p><span class="dot" style="background:#10b981;"></span><span id="ui-c-present">Present</span></p>
+        </div>
+        <div class="counter-box">
+          <h2 id="count-absent">0</h2>
+          <p><span class="dot" style="background:#ef4444;"></span><span id="ui-c-absent">Absent</span></p>
+        </div>
+        <div class="counter-box">
+          <h2 id="count-late">0</h2>
+          <p><span class="dot" style="background:#f59e0b;"></span><span id="ui-c-late">Late</span></p>
+        </div>
+      </div>
+
       <div class="card">
         <h3 id="ui-title-add-att">📋 ບັນທຶກການມາວຽກມື້ຕໍ່ມື້</h3>
         <form id="attendanceForm" onsubmit="event.preventDefault(); saveRecord();">
@@ -252,7 +314,7 @@
               <label id="ui-label-status">ສະຖານະ:</label>
               <select id="statusSelect" required>
                 <option value="Present" id="opt-present">Present (ມາ)</option>
-                <option value="Absent" id="opt-absent">Absent (າດ)</option>
+                <option value="Absent" id="opt-absent">Absent (ຂາດ)</option>
                 <option value="Late" id="opt-late">Late (ສາຍ)</option>
               </select>
             </div>
@@ -268,8 +330,7 @@
       <div class="search-box">
         <input type="text" id="searchInput" oninput="renderAttendance()" placeholder="🔍 ຄົ້ນຫາຊື່ພະນັກງານ...">
       </div>
-      <div id="attendanceHistoryContainer">
-        </div>
+      <div id="attendanceHistoryContainer"></div>
     </div>
 
     <div class="tab-panel" id="tab1">
@@ -318,8 +379,7 @@
         </form>
       </div>
 
-      <div class="employee-grid" id="employeeListContainer">
-        </div>
+      <div class="employee-grid" id="employeeListContainer"></div>
     </div>
   </main>
 
@@ -334,7 +394,7 @@
 
   <script>
     // -----------------------------------------------------------------
-    // CONFIG & DICTIONARY (2 ພາສາ)
+    // CONFIG & DICTIONARY
     // -----------------------------------------------------------------
     const API = "https://script.google.com/macros/s/AKfycbwkgZI1JqULFpxl5oGN1-hnVH_sLqL70pS_vma_0enW9W02Ubgg1W3OYGKtZiC5R27esw/exec";
     
@@ -373,9 +433,13 @@
     let employees = [];
     let attendance = [];
 
-    // -----------------------------------------------------------------
+    // 🎨 FUNCTION CHANGE THEME COLOR
+    function changeTheme(colorVal) {
+      document.documentElement.style.setProperty('--primary', colorVal);
+      document.documentElement.style.setProperty('--primary-hover', colorVal + 'cc');
+    }
+
     // MULTI-LANGUAGE SYSTEM
-    // -----------------------------------------------------------------
     function changeLang(lang) {
       currentLang = lang;
       document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -411,14 +475,15 @@
       document.getElementById('opt-present').textContent = l.optPresent;
       document.getElementById('opt-absent').textContent = l.optAbsent;
       document.getElementById('opt-late').textContent = l.optLate;
+      
+      document.getElementById('ui-c-present').textContent = l.statusPresent;
+      document.getElementById('ui-c-absent').textContent = l.statusAbsent;
+      document.getElementById('ui-c-late').textContent = l.statusLate;
 
       renderAttendance();
       renderEmployees();
     }
 
-    // -----------------------------------------------------------------
-    // CONTROLLERS
-    // -----------------------------------------------------------------
     function switchTab(idx) {
       document.querySelectorAll('.nav-item').forEach((b, i) => b.classList.toggle('active', i === idx));
       document.querySelectorAll('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
@@ -433,20 +498,40 @@
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    // -----------------------------------------------------------------
-    // DATA LAYER (API)
-    // -----------------------------------------------------------------
+    // FETCH DATA & FIX DROPDOWN MAPPING
     async function fetchData() {
       setLoading(true);
       try {
         const res = await fetch(API);
         const data = await res.json();
-        employees = data.employees || [];
-        attendance = data.attendance || [];
+        
+        // 🛠️ ແກ້ໄຂບັກການອ່ານຄ່າຊື່ຫົວຖັນ (ໃຫ້ຮອງຮັບທັງຕົວພິມໃຫຍ່ ແລະ ພິມນ້ອຍ)
+        employees = (data.employees || []).map(e => ({
+          employeeid: e.employeeid || e.id || e.EmployeeID || '',
+          fullname: e.fullname || e.name || e.FullName || '',
+          phonenumber: e.phonenumber || e.phone || e.PhoneNumber || '',
+          village: e.village || '',
+          district: e.district || '',
+          province: e.province || '',
+          department: e.department || '',
+          position: e.position || '',
+          profileimage: e.profileimage || e.image || ''
+        }));
+
+        attendance = (data.attendance || []).map(a => ({
+          rowIndex: a.rowIndex || a.rowindex,
+          employeeid: a.employeeid || a.id,
+          fullname: a.fullname || a.name,
+          date: a.date,
+          status: a.status,
+          remarks: a.remarks || '',
+          time: a.time
+        }));
         
         document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
         
         loadEmpDropdown();
+        calculateCounters();
         renderAttendance();
         renderEmployees();
       } catch (err) {
@@ -454,6 +539,25 @@
       } finally {
         setLoading(false);
       }
+    }
+
+    function loadEmpDropdown() {
+      const select = document.getElementById('empSelect');
+      if (!select) return;
+      select.innerHTML = '<option value="">-- ເລືອກພະນັກງານ --</option>' + 
+        employees.map(e => `<option value="${esc(e.employeeid)}|${esc(e.fullname)}">${esc(e.fullname)} (${esc(e.employeeid)})</option>`).join('');
+    }
+
+    function calculateCounters() {
+      let p = 0, a = 0, l = 0;
+      attendance.forEach(r => {
+        if (r.status === 'Present') p++;
+        if (r.status === 'Absent') a++;
+        if (r.status === 'Late') l++;
+      });
+      document.getElementById('count-present').textContent = p;
+      document.getElementById('count-absent').textContent = a;
+      document.getElementById('count-late').textContent = l;
     }
 
     function getBase64(file) {
@@ -477,9 +581,7 @@
       const imgFile = document.getElementById('empImageFile').files[0];
       
       let base64Img = "";
-      if (imgFile) {
-        base64Img = await getBase64(imgFile);
-      }
+      if (imgFile) { base64Img = await getBase64(imgFile); }
 
       setLoading(true);
       try {
@@ -493,11 +595,7 @@
         alert(langData[currentLang].alertSuccess);
         document.getElementById('employeeForm').reset();
         fetchData();
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+      } catch (err) { console.error(err); } finally { setLoading(false); }
     }
 
     async function saveRecord() {
@@ -518,26 +616,16 @@
         alert(langData[currentLang].alertSuccess);
         document.getElementById('remarksInput').value = "";
         fetchData();
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+      } catch (err) { console.error(err); } finally { setLoading(false); }
     }
 
     async function deleteAttendance(rowIndex) {
       if (confirm(langData[currentLang].confirmDel)) {
         setLoading(true);
         try {
-          await fetch(API, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({ action: 'deleteAttendance', rowIndex: rowIndex })
-          });
+          await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'deleteAttendance', rowIndex: rowIndex }) });
           fetchData();
-        } catch (err) {
-          console.error(err);
-        }
+        } catch (err) { console.error(err); }
       }
     }
 
@@ -545,26 +633,10 @@
       if (confirm(langData[currentLang].confirmDel)) {
         setLoading(true);
         try {
-          await fetch(API, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({ action: 'deleteEmployee', id: id })
-          });
+          await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'deleteEmployee', id: id }) });
           fetchData();
-        } catch (err) {
-          console.error(err);
-        }
+        } catch (err) { console.error(err); }
       }
-    }
-
-    // -----------------------------------------------------------------
-    // RENDER UI LAYER
-    // -----------------------------------------------------------------
-    function loadEmpDropdown() {
-      const select = document.getElementById('empSelect');
-      if (!select) return;
-      select.innerHTML = '<option value="">-- ເລືອກພະນັກງານ --</option>' + 
-        employees.map(e => `<option value="${esc(e.employeeid)}|${esc(e.fullname)}">${esc(e.fullname)} (${esc(e.employeeid)})</option>`).join('');
     }
 
     function renderAttendance() {
@@ -589,9 +661,9 @@
         return `
           <div class="att-item">
             <div class="att-details">
-              <h4>${esc(r.fullname)} <span style="font-size:12px; color:gray;">(${esc(r.employeeid)})</span></h4>
+              <h4>${esc(r.fullname)} <span style="font-size:12px; color:#94a3b8;">踩(${esc(r.employeeid)})</span></h4>
               <p>📅 ${esc(r.date)} | ⏰ ${esc(r.time || '')}</p>
-              ${r.remarks ? `<p style="font-style:italic; color:#4f46e5;">📝 ${esc(r.remarks)}</p>` : ''}
+              ${r.remarks ? `<p style="font-style:italic; color:var(--primary);">📝 ${esc(r.remarks)}</p>` : ''}
             </div>
             <div style="display:flex; align-items:center; gap:10px;">
               <span class="badge ${esc(r.status)}">${esc(displayStatus)}</span>
@@ -611,7 +683,7 @@
       }
 
       container.innerHTML = employees.map(emp => {
-        const fallbackImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24'><path fill='%23cbd5e1' d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z'/></svg>";
+        const fallbackImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24'><path fill='%2364748b' d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z'/></svg>";
         const profileSrc = emp.profileimage ? emp.profileimage : fallbackImg;
 
         return `
@@ -622,14 +694,13 @@
               <p>🆔 ID: ${esc(emp.employeeid)}</p>
               <p>📞 Phone: ${esc(emp.phonenumber)}</p>
               <p>🏢 ${esc(emp.department || '-')} | 💼 ${esc(emp.position || '-')}</p>
-              <p>📍 ${esc(emp.village || '')}, ${esc(emp.district || '')}, ${esc(emp.province || '')}</p>
+              <p>📍 ${esc(emp.village || '')} ${esc(emp.district || '')} ${esc(emp.province || '')}</p>
             </div>
             <button class="btn-del-icon" style="position:absolute; top:10px; right:10px;" onclick="deleteEmployee('${esc(emp.employeeid)}')">🗑️</button>
           </div>`;
       }).join('');
     }
 
-    // Initial Load
     window.onload = fetchData;
   </script>
 </body>
