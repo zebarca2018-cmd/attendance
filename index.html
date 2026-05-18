@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Attendance & Employee Management</title>
+  <title>Attendance Management System</title>
   <style>
     :root {
       --bg-main: #0f172a;
@@ -18,32 +18,19 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Noto Sans Lao', 'Inter', system-ui, -apple-system, sans-serif;
+      font-family: 'Noto Sans Lao', system-ui, -apple-system, sans-serif;
       background-color: var(--bg-main);
       color: var(--text-main);
       padding-bottom: 90px;
     }
 
     .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #1e293b;
-      padding: 15px 20px;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      background: #1e293b; padding: 15px 20px; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
     }
     .top-bar h1 { font-size: 16px; color: var(--primary); font-weight: 600; }
     
-    .controls-right { display: flex; align-items: center; gap: 12px; }
-    
-    .color-picker-wrapper input[type="color"] {
-      -webkit-appearance: none; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; background: none;
-    }
-    .color-picker-wrapper input[type="color"]::-webkit-color-swatch { border: 2px solid #fff; border-radius: 50%; }
-
     .lang-switcher { display: flex; gap: 6px; }
     .lang-btn {
       background: #334155; border: 1px solid var(--border); color: var(--text-main);
@@ -65,7 +52,7 @@
     .form-group { display: flex; flex-direction: column; }
     label { margin-bottom: 8px; font-size: 14px; color: var(--text-muted); }
     
-    select, input, textarea {
+    select, input {
       width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px;
       font-size: 14px; background-color: #0f172a; color: var(--text-main); font-family: inherit;
     }
@@ -75,33 +62,37 @@
       border-radius: 10px; font-size: 14px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 20px;
     }
 
-    .dashboard-counters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-    .counter-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; }
-    
-    /* 📊 TABLE FOR INDIVIDUAL SUMMARY DASHBOARD */
+    /* 📊 DASHBOARD TABLE */
     .table-responsive { overflow-x: auto; margin-top: 15px; }
     .summary-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
     .summary-table th, .summary-table td { padding: 12px; border-bottom: 1px solid var(--border); }
     .summary-table th { background-color: #0f172a; color: var(--text-muted); }
 
-    .att-item {
-      background: var(--bg-card); border-radius: 12px; padding: 16px; border: 1px solid var(--border);
-      margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
-    }
+    /* 👥 GROUPED ATTENDANCE STYLES */
+    .emp-group-card { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+    .emp-group-header { background: #1e293b; padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); }
+    .group-img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
+    .group-info h4 { font-size: 15px; color: var(--text-main); }
+    .group-info p { font-size: 12px; color: var(--text-muted); }
     
-    .badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .att-sub-item {
+      padding: 12px 15px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; font-size: 13px;
+    }
+    .att-sub-item:last-child { border-bottom: none; }
+    
+    .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
     .badge.Present { background: rgba(16, 185, 129, 0.2); color: #34d399; }
     .badge.Absent { background: rgba(239, 68, 68, 0.2); color: #f87171; }
     .badge.Late { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+
+    .btn-del-icon { background: none; border: none; color: #f87171; cursor: pointer; font-size: 14px; }
 
     .employee-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
     .profile-card { background: var(--bg-card); border-radius: 14px; padding: 16px; border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; position: relative; }
     .profile-img-circle { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
 
-    .btn-del-icon { background: none; border: none; color: #f87171; cursor: pointer; font-size: 16px; }
-
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: #1e293b; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
-    .nav-item { background: none; border: none; flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; font-size: 12px; font-family: inherit; }
+    .nav-item { background: none; border: none; flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; font-size: 12px; }
     .nav-item span { font-size: 20px; }
     .nav-item.active { color: var(--primary); font-weight: 600; }
 
@@ -115,12 +106,9 @@
 
   <div class="top-bar">
     <h1 id="ui-app-title">📅 ລະບົບຈັດການລາຍຊື່ ແລະ ເວລາມາວຽກ</h1>
-    <div class="controls-right">
-      <div class="color-picker-wrapper"><input type="color" id="themePicker" value="#3b82f6" oninput="changeTheme(this.value)"></div>
-      <div class="lang-switcher">
-        <button class="lang-btn active" onclick="changeLang('lo')">🇱🇦 LAO</button>
-        <button class="lang-btn" onclick="changeLang('en')">🇬🇧 ENG</button>
-      </div>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="changeLang('lo')">🇱🇦 LAO</button>
+      <button class="lang-btn" onclick="changeLang('en')">🇬🇧 ENG</button>
     </div>
   </div>
 
@@ -128,12 +116,7 @@
 
   <main>
     <div class="tab-panel active" id="tab0">
-      <div class="dashboard-counters">
-        <div class="counter-box"><h2 id="count-present">0</h2><p>🟢 <span id="ui-c-present">Present</span></p></div>
-        <div class="counter-box"><h2 id="count-absent">0</h2><p>🔴 <span id="ui-c-absent">Absent</span></p></div>
-        <div class="counter-box"><h2 id="count-late">0</h2><p>🟡 <span id="ui-c-late">Late</span></p></div>
-      </div>
-
+      
       <div class="card">
         <h3 id="ui-title-summary">📊 ສະຫຼຸບວັນເຮັດວຽກພະນັກງານ (Summary Dashboard)</h3>
         <div class="table-responsive">
@@ -142,7 +125,7 @@
               <tr>
                 <th id="th-name">ຊື່ພະນັກງານ</th>
                 <th id="th-present">ມາ (Present)</th>
-                <th id="th-absent">ຂາດ (Absent)</th>
+                <th id="th-absent">າດ (Absent)</th>
                 <th id="th-late">ສາຍ (Late)</th>
               </tr>
             </thead>
@@ -157,11 +140,19 @@
           <div class="form-grid">
             <div class="form-group">
               <label id="ui-label-select-emp">ເລືອກພະນັກງານ:</label>
-              <select id="empSelect" required><option value="">-- ເລືອກພະນັກງານ --</option></select>
+              <select id="empSelect" required><option value="">-- ເມນູເລືອກ --</option></select>
             </div>
             <div class="form-group">
               <label id="ui-label-date">ວັນທີ:</label>
               <input type="date" id="dateInput" required>
+            </div>
+            <div class="form-group">
+              <label id="ui-label-time">ເວລາເຮັດວຽກ:</label>
+              <select id="timeSelect" required>
+                <option value="08:00 - 17:30">08:00 - 17:30 (Normal Shift)</option>
+                <option value="08:30 - 17:00">08:30 - 17:00</option>
+                <option value="13:00 - 21:00">13:00 - 21:00 (Evening Shift)</option>
+              </select>
             </div>
             <div class="form-group">
               <label id="ui-label-status">ສະຖານະ:</label>
@@ -180,7 +171,10 @@
         </form>
       </div>
 
-      <div class="search-box"><input type="text" id="searchInput" oninput="renderAttendance()" placeholder="🔍 ຄົ້ນຫາຊື່ພະນັກງານ..."></div>
+      <div style="margin-bottom: 15px;">
+        <input type="text" id="searchInput" oninput="renderAttendance()" placeholder="🔍 ຄົ້ນຫາຊື່ພະນັກງານ..." style="background:#1e293b; border:1px solid var(--border);">
+      </div>
+      
       <div id="attendanceHistoryContainer"></div>
     </div>
 
@@ -189,14 +183,14 @@
         <h3 id="ui-title-add-emp">➕ ເພີ່ມພະນັກງານໃໝ່</h3>
         <form id="employeeForm" onsubmit="event.preventDefault(); saveEmployee();">
           <div class="form-grid">
-            <div class="form-group"><label id="ui-emp-id">ລະຫັດພະນັກງານ:</label><input type="text" id="empId" required placeholder="sk022"></div>
-            <div class="form-group"><label id="ui-emp-name">ຊື່ ແລະ ນາມສະກຸນ:</label><input type="text" id="empName" required placeholder="..."></div>
-            <div class="form-group"><label id="ui-emp-phone">ເບີໂທ:</label><input type="text" id="empPhone" required placeholder="2077..."></div>
-            <div class="form-group"><label id="ui-emp-village">ບ້ານ:</label><input type="text" id="empVillage" placeholder="..."></div>
-            <div class="form-group"><label id="ui-emp-district">ເມືອງ:</label><input type="text" id="empDistrict" placeholder="..."></div>
-            <div class="form-group"><label id="ui-emp-province">ແຂວງ:</label><input type="text" id="empProvince" placeholder="..."></div>
-            <div class="form-group"><label id="ui-emp-dept">ພະແນກ:</label><input type="text" id="empDept" placeholder="..."></div>
-            <div class="form-group"><label id="ui-emp-pos">ຕຳແໜ່ງ:</label><input type="text" id="empPos" placeholder="..."></div>
+            <div class="form-group"><label id="ui-emp-id">ລະຫັດພະນັກງານ:</label><input type="text" id="empId" required></div>
+            <div class="form-group"><label id="ui-emp-name">ຊື່ ແລະ ນາມສະກຸນ:</label><input type="text" id="empName" required></div>
+            <div class="form-group"><label id="ui-emp-phone">ເບີໂທ:</label><input type="text" id="empPhone" required></div>
+            <div class="form-group"><label id="ui-emp-village">ບ້ານ:</label><input type="text" id="empVillage"></div>
+            <div class="form-group"><label id="ui-emp-district">ເມືອງ:</label><input type="text" id="empDistrict"></div>
+            <div class="form-group"><label id="ui-emp-province">ແຂວງ:</label><input type="text" id="empProvince"></div>
+            <div class="form-group"><label id="ui-emp-dept">ພະແນກ:</label><input type="text" id="empDept"></div>
+            <div class="form-group"><label id="ui-emp-pos">ຕຳແໜ່ງ:</label><input type="text" id="empPos"></div>
             <div class="form-group" style="grid-column: 1 / -1;"><label id="ui-emp-img">ຮູບໂປຣໄຟລ໌:</label><input type="file" id="empImageFile" accept="image/*"></div>
           </div>
           <button class="btn-submit" type="submit" id="ui-btn-save-emp">+ ເພີ່ມພະນັກງານ</button>
@@ -218,7 +212,7 @@
       lo: {
         appTitle: "📅 ລະບົບຈັດການລາຍຊື່ ແລະ ເວລາມາວຽກ", navAtt: "ບັນທຶກວຽກ", navEmp: "ພະນັກງານ",
         titleSummary: "📊 ສະຫຼຸບວັນເຮັດວຽກພະນັກງານ (Dashboard)", thName: "ຊື່ພະນັກງານ", thPresent: "ມາ (Present)", thAbsent: "ຂາດ (Absent)", thLate: "ສາຍ (Late)",
-        titleAddAtt: "📋 ບັນທຶກການມາວຽກມື້ຕໍ່ມື້", labelSelectEmp: "ເລືອກພະນັກງານ:", labelDate: "ວັນທີ:", labelStatus: "ສະຖານະ:", labelRemarks: "ໝາຍເຫດ:",
+        titleAddAtt: "📋 ບັນທຶກການມາວຽກມື້ຕໍ່ມື້", labelSelectEmp: "ເລືອກພະນັກງານ:", labelDate: "ວັນທີ:", labelStatus: "ສະຖານະ:", labelRemarks: "ໝາຍເຫດ:", labelTime: "ເວລາເຮັດວຽກ:",
         btnSaveAtt: "+ ບັນທຶກເວລາມາວຽກ", searchPlace: "🔍 ຄົ້ນຫາຊື່ພະນັກງານ...", titleAddEmp: "➕ ເພີ່ມພະນັກງານໃໝ່",
         empId: "ລະຫັດພະນັກງານ:", empName: "ຊື່ ແລະ ນາມສະກຸນ:", empPhone: "ເບີໂທ:", empVillage: "ບ້ານ:", empDistrict: "ເມືອງ:", empProvince: "ແຂວງ:",
         empDept: "ພະແນກ:", empPos: "ຕຳແໜ່ງ:", empImg: "ຮູບໂປຣໄຟລ໌:", btnSaveEmp: "+ ເພີ່ມພະນັກງານ",
@@ -228,7 +222,7 @@
       en: {
         appTitle: "📅 Attendance & Employee Management", navAtt: "Attendance", navEmp: "Employees",
         titleSummary: "📊 Employee Attendance Summary (Dashboard)", thName: "Employee Name", thPresent: "Present", thAbsent: "Absent", thLate: "Late",
-        titleAddAtt: "📋 Daily Attendance Tracking", labelSelectEmp: "Select Employee:", labelDate: "Date:", labelStatus: "Status:", labelRemarks: "Remarks:",
+        titleAddAtt: "📋 Daily Attendance Tracking", labelSelectEmp: "Select Employee:", labelDate: "Date:", labelStatus: "Status:", labelRemarks: "Remarks:", labelTime: "Work Shift:",
         btnSaveAtt: "+ Save Record", searchPlace: "🔍 Search employee name...", titleAddEmp: "➕ Add New Employee",
         empId: "Employee ID:", empName: "Full Name:", empPhone: "Phone Number:", empVillage: "Village:", empDistrict: "District:", empProvince: "Province:",
         empDept: "Department:", empPos: "Position:", empImg: "Profile Image:", btnSaveEmp: "+ Add Employee",
@@ -238,11 +232,7 @@
     };
 
     let currentLang = 'lo'; let employees = []; let attendance = [];
-
-    function changeTheme(colorVal) {
-      document.documentElement.style.setProperty('--primary', colorVal);
-      document.documentElement.style.setProperty('--primary-hover', colorVal + 'cc');
-    }
+    const fallbackImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24'><path fill='%2364748b' d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z'/></svg>";
 
     function changeLang(lang) {
       currentLang = lang;
@@ -264,6 +254,7 @@
       document.getElementById('ui-label-select-emp').textContent = l.labelSelectEmp;
       document.getElementById('ui-label-date').textContent = l.labelDate;
       document.getElementById('ui-label-status').textContent = l.labelStatus;
+      document.getElementById('ui-label-time').textContent = l.labelTime;
       document.getElementById('ui-label-remarks').textContent = l.labelRemarks;
       document.getElementById('ui-btn-save-att').textContent = l.btnSaveAtt;
       document.getElementById('searchInput').placeholder = l.searchPlace;
@@ -275,9 +266,6 @@
       document.getElementById('opt-present').textContent = l.optPresent;
       document.getElementById('opt-absent').textContent = l.optAbsent;
       document.getElementById('opt-late').textContent = l.optLate;
-      document.getElementById('ui-c-present').textContent = l.statusPresent;
-      document.getElementById('ui-c-absent').textContent = l.statusAbsent;
-      document.getElementById('ui-c-late').textContent = l.statusLate;
       renderAttendance(); renderEmployees();
     }
 
@@ -289,40 +277,34 @@
     function setLoading(show) { document.getElementById('loadingBar').classList.toggle('active', show); }
     function esc(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
-    // 🛠️ ຟັງຊັນຊອກຫາຄີແບບອັດຕະໂນມັດ ບໍ່ວ່າຈະຂຽນຫົວຂໍ້ຖັນເປັນພາສາໃດກໍຕາມ
-    function findVal(obj, keyName) {
-      const target = keyName.toLowerCase();
-      for (let k in obj) {
-        if (k.toLowerCase().includes(target)) return obj[k];
-      }
-      return '';
-    }
-
     async function fetchData() {
       setLoading(true);
       try {
         const res = await fetch(API); const data = await res.json();
         
-        // ແກ້ໄຂການດຶງຂໍ້ມູນໃຫ້ຮອງຮັບຫົວຖັນທຸກຮູບແບບ
         employees = (data.employees || []).map(e => ({
-          employeeid: findVal(e, 'id') || findVal(e, 'employee'),
-          fullname: findVal(e, 'name') || findVal(e, 'full'),
-          phonenumber: findVal(e, 'phone'),
-          village: findVal(e, 'village'), district: findVal(e, 'district'), province: findVal(e, 'province'),
-          department: findVal(e, 'dept') || findVal(e, 'department'), position: findVal(e, 'pos') || findVal(e, 'position'),
-          profileimage: findVal(e, 'image') || findVal(e, 'profile')
+          employeeid: e.employeeid || e.id,
+          fullname: e.fullname || e.name,
+          phonenumber: e.phonenumber || e.phone,
+          village: e.village, district: e.district, province: e.province,
+          department: e.department || e.dept, position: e.position || e.pos,
+          profileimage: e.profileimage || e.image
         }));
 
         attendance = (data.attendance || []).map(a => ({
           rowIndex: a.rowIndex || a.rowindex,
-          employeeid: findVal(a, 'id') || findVal(a, 'employee'),
-          fullname: findVal(a, 'name') || findVal(a, 'full'),
-          date: findVal(a, 'date'), status: findVal(a, 'status'), remarks: findVal(a, 'remark'), time: findVal(a, 'time')
+          employeeid: a.employeeid || a.id,
+          fullname: a.fullname || a.name,
+          date: a.date, status: a.status, remarks: a.remarks || a.remark, time: a.time
         }));
         
-        document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
+        // ຕັ້ງຄ່າວັນທີປະຈຸບັນໃຫ້ກົງກັບທ້ອງຖິ່ນ (Local Time)
+        const local = new Date();
+        const offset = local.getTimezoneOffset();
+        const localDate = new Date(local.getTime() - (offset * 60 * 1000));
+        document.getElementById('dateInput').value = localDate.toISOString().split('T')[0];
         
-        loadEmpDropdown(); calculateCounters(); buildDashboardSummary(); renderAttendance(); renderEmployees();
+        loadEmpDropdown(); buildDashboardSummary(); renderAttendance(); renderEmployees();
       } catch (err) { console.error(err); } finally { setLoading(false); }
     }
 
@@ -332,17 +314,6 @@
         employees.map(e => `<option value="${esc(e.employeeid)}|${esc(e.fullname)}">${esc(e.fullname)} (${esc(e.employeeid)})</option>`).join('');
     }
 
-    function calculateCounters() {
-      let p = 0, a = 0, l = 0;
-      attendance.forEach(r => {
-        if (r.status === 'Present') p++; if (r.status === 'Absent') a++; if (r.status === 'Late') l++;
-      });
-      document.getElementById('count-present').textContent = p;
-      document.getElementById('count-absent').textContent = a;
-      document.getElementById('count-late').textContent = l;
-    }
-
-    // 📊 ສ້າງແຜງ DASHBOARD ສະຫຼຸບວັນເຮັດວຽກຂອງແຕ່ລະຄົນ
     function buildDashboardSummary() {
       const body = document.getElementById('dashboardSummaryBody'); if (!body) return;
       let summaryMap = {};
@@ -367,6 +338,94 @@
         </tr>`;
       }
       body.innerHTML = html || '<tr><td colspan="4" style="text-align:center; color:gray;">No data</td></tr>';
+    }
+
+    // 👥 ຟັງຊັນຈັດກຸ່ມປະຫວັດການມາວຽກແຍກເປັນລາຍບຸກຄົນ ແລະ ໄລ່ລຽງວັນທີ
+    function renderAttendance() {
+      const container = document.getElementById('attendanceHistoryContainer'); if (!container) return;
+      const query = document.getElementById('searchInput').value.toLowerCase(); const l = langData[currentLang];
+      
+      // 1. ກັ່ນຕອງຕາມຄຳຄົ້ນຫາ
+      const filtered = attendance.filter(r => (r.fullname || '').toLowerCase().includes(query));
+      if (filtered.length === 0) { container.innerHTML = `<p style="text-align:center; color:gray; padding:20px;">No data found</p>`; return; }
+
+      // 2. ຈັດກຸ່ມຂໍ້ມູນຕາມ Employee ID
+      let groups = {};
+      filtered.forEach(rec => {
+        if (!groups[rec.employeeid]) {
+          // ຊອກຫາຮູບໂປຣໄຟລ໌ຈາກລາຍຊື່ພະນັກງານ
+          const empObj = employees.find(e => e.employeeid === rec.employeeid);
+          groups[rec.employeeid] = {
+            id: rec.employeeid,
+            name: rec.fullname,
+            img: (empObj && empObj.profileimage) ? empObj.profileimage : fallbackImg,
+            records: []
+          };
+        }
+        groups[rec.employeeid].records.push(rec);
+      });
+
+      // 3. ສະແດງຜົນແຍກແຕ່ລະຄົນ ແລະ ລຽງລໍາດັບວັນທີ (ເກົ່າໄປໃໝ່ ຕັ້ງແຕ່ຕົ້ນເດືອນ)
+      let html = '';
+      for (let empId in groups) {
+        let group = groups[empId];
+        
+        // ລຽງວັນທີຈາກນ້ອຍໄປຫາຫຼາຍ
+        group.records.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        html += `
+          <div class="emp-group-card">
+            <div class="emp-group-header">
+              <img class="group-img" src="${group.img}">
+              <div class="group-info">
+                <h4>${esc(group.name)}</h4>
+                <p>🆔 ID: ${esc(group.id)}</p>
+              </div>
+            </div>
+            <div class="group-records-list">
+              ${group.records.map(r => {
+                let displayStatus = r.status === 'Present' ? l.statusPresent : (r.status === 'Absent' ? l.statusAbsent : l.statusLate);
+                return `
+                  <div class="att-sub-item">
+                    <div>
+                      <strong>📅 ${esc(r.date)}</strong> | ⏰ ${esc(r.time || '08:00 - 17:30')}
+                      ${r.remarks ? `<br><span style="color:var(--primary); font-size:12px;">📝 ${esc(r.remarks)}</span>` : ''}
+                    </div>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                      <span class="badge ${esc(r.status)}">${esc(displayStatus)}</span>
+                      <button class="btn-del-icon" onclick="deleteAttendance('${r.rowIndex}')">🗑️</button>
+                    </div>
+                  </div>`;
+              }).join('')}
+            </div>
+          </div>`;
+      }
+      container.innerHTML = html;
+    }
+
+    async function saveRecord() {
+      const selectVal = document.getElementById('empSelect').value; if (!selectVal) return;
+      const [id, name] = selectVal.split('|');
+      const date = document.getElementById('dateInput').value;
+      const status = document.getElementById('statusSelect').value;
+      const time = document.getElementById('timeSelect').value;
+      const remarks = document.getElementById('remarksInput').value;
+
+      setLoading(true);
+      try {
+        await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'addAttendance', id, name, date, status, time, remarks }) });
+        alert(langData[currentLang].alertSuccess); document.getElementById('remarksInput').value = ""; fetchData();
+      } catch (err) { console.error(err); } finally { setLoading(false); }
+    }
+
+    async function deleteAttendance(rowIndex) {
+      if (confirm(langData[currentLang].confirmDel)) {
+        setLoading(true);
+        try {
+          await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'deleteAttendance', rowIndex: rowIndex }) });
+          fetchData();
+        } catch (err) { console.error(err); } finally { setLoading(false); }
+      }
     }
 
     function getBase64(file) {
@@ -395,29 +454,6 @@
       } catch (err) { console.error(err); } finally { setLoading(false); }
     }
 
-    async function saveRecord() {
-      const selectVal = document.getElementById('empSelect').value; if (!selectVal) return;
-      const [id, name] = selectVal.split('|');
-      const date = document.getElementById('dateInput').value; const status = document.getElementById('statusSelect').value;
-      const remarks = document.getElementById('remarksInput').value;
-
-      setLoading(true);
-      try {
-        await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'addAttendance', id, name, date, status, remarks }) });
-        alert(langData[currentLang].alertSuccess); document.getElementById('remarksInput').value = ""; fetchData();
-      } catch (err) { console.error(err); } finally { setLoading(false); }
-    }
-
-    async function deleteAttendance(rowIndex) {
-      if (confirm(langData[currentLang].confirmDel)) {
-        setLoading(true);
-        try {
-          await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'deleteAttendance', rowIndex: rowIndex }) });
-          fetchData();
-        } catch (err) { console.error(err); } finally { setLoading(false); }
-      }
-    }
-
     async function deleteEmployee(id) {
       if (confirm(langData[currentLang].confirmDel)) {
         setLoading(true);
@@ -428,36 +464,11 @@
       }
     }
 
-    function renderAttendance() {
-      const container = document.getElementById('attendanceHistoryContainer'); if (!container) return;
-      const query = document.getElementById('searchInput').value.toLowerCase(); const l = langData[currentLang];
-      const filtered = attendance.filter(r => (r.fullname || '').toLowerCase().includes(query));
-
-      if (filtered.length === 0) { container.innerHTML = `<p style="text-align:center; color:gray; padding:20px;">No data found</p>`; return; }
-
-      container.innerHTML = filtered.map(r => {
-        let displayStatus = r.status === 'Present' ? l.statusPresent : (r.status === 'Absent' ? l.statusAbsent : l.statusLate);
-        return `
-          <div class="att-item">
-            <div class="att-details">
-              <h4>${esc(r.fullname)} <span style="font-size:12px; color:var(--text-muted);">(${esc(r.employeeid)})</span></h4>
-              <p>📅 ${esc(r.date)} | ⏰ ${esc(r.time)}</p>
-              ${r.remarks ? `<p style="font-style:italic; color:var(--primary);">📝 ${esc(r.remarks)}</p>` : ''}
-            </div>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <span class="badge ${esc(r.status)}">${esc(displayStatus)}</span>
-              <button class="btn-del-icon" onclick="deleteAttendance('${r.rowIndex}')">🗑️</button>
-            </div>
-          </div>`;
-      }).join('');
-    }
-
     function renderEmployees() {
       const container = document.getElementById('employeeListContainer'); if (!container) return;
       if (employees.length === 0) { container.innerHTML = `<p style="text-align:center; color:gray; padding:20px; grid-column:1/-1;">No employees</p>`; return; }
 
       container.innerHTML = employees.map(emp => {
-        const fallbackImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24'><path fill='%2364748b' d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z'/></svg>";
         return `
           <div class="profile-card">
             <img class="profile-img-circle" src="${emp.profileimage || fallbackImg}" alt="Profile">
