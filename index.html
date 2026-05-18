@@ -894,30 +894,41 @@
     if (ok) showToast('Record removed.');
   }
 
-  function renderAll() {
-    const tbody  = document.getElementById('attBody');
-    const counts = { Present: 0, Absent: 0, Late: 0 };
-    records.forEach(r => counts[r.status]++);
+ function renderAll() {
+  const tbody = document.getElementById('attendanceBody');
+  if (!tbody) return;
 
-    document.getElementById('countPresent').textContent = counts.Present;
-    document.getElementById('countAbsent').textContent  = counts.Absent;
-    document.getElementById('countLate').textContent    = counts.Late;
-    document.getElementById('totalCount').textContent   =
-      records.length + (records.length === 1 ? ' record' : ' records');
+  if (!records || records.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">ບໍ່ມີຂໍ້ມູນການມາວຽກ</td></tr>`;
+    return;
+  }
 
-    if (records.length === 0) {
-      tbody.innerHTML = emptyState('📋', 'No records yet. Add an entry above to get started.', 6);
-    } else {
-     tbody.innerHTML = records.map((r, i) => `
-          <tr>
-            <td>${records.length - i}</td>
-            <td>${esc(r.name)}</td>
-            <td>${r.date ? new Date(r.date).toLocaleDateString('lo-LA') : ''}</td>
-            <td><span class="badge ${esc(r.status)}">${esc(r.status)}</span></td>
-            <td class="muted">${esc(r.time || '')}</td>
-            <td><button class="btn-del" onclick="deleteAttendance('${r.rowIndex}')" title="Remove">X</button></td>
-          </tr>`).join('');
-    
+  tbody.innerHTML = records.map((r, i) => {
+    // ແປງຮູບແບບວັນທີໃຫ້ອ່ານໄດ້ງ່າຍ ແລະ ບໍ່ຂຶ້ນ Invalid Date
+    let displayDate = '';
+    if (r.date) {
+      const d = new Date(r.date);
+      if (!isNaN(d.getTime())) {
+        displayDate = d.toLocaleDateString('lo-LA');
+      } else {
+        displayDate = r.date; // ຖ້າແປງບໍ່ໄດ້ໃຫ້ສະແດງຄ່າເດີມຈາກ Sheet
+      }
+    }
+
+    return `
+      <tr>
+        <td>${records.length - i}</td>
+        <td>${esc(r.name)}</td>
+        <td>${displayDate}</td>
+        <td><span class="badge ${esc(r.status)}">${esc(r.status)}</span></td>
+        <td class="muted">${esc(r.time || '')}</td>
+        <td>
+          <button class="btn-del" onclick="deleteAttendance('${r.rowIndex}')" title="Remove">X</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
     populateYears();
     renderSummary();
   }
