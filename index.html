@@ -294,7 +294,7 @@
 
     <div class="tab-panel" id="tab1">
       <div class="card">
-        <h3>➕ ເpreິ່ມພະນັກງານໃໝ່</h3>
+        <h3>➕ ເພີ່ມພະນັກງານໃໝ່</h3>
         <form id="employeeForm" onsubmit="event.preventDefault(); saveEmployee();">
           <div class="att-form-grid">
             <div>
@@ -343,7 +343,7 @@
     // -----------------------------------------------------------------
     // CONFIG & GLOBALS
     // -----------------------------------------------------------------
-    // ⚠️ ປ່ຽນ URL ດ້ານລຸ່ມນີ້ໃຫ້ເປັນ Web App URL ຂອງເຈົ້າຄືເກົ່າເດີ້
+    // ⚠️ ປ່ຽນ URL ດ້ານລຸ່ມນີ້ໃຫ້ເປັນ Web App URL ຂອງທ່ານຄືເກົ່າເດີ້
     const API = "https://script.google.com/macros/s/AKfycby3V9NfZ-5C04uNqJ6mBvK6z7fK8b_6m1B9-O6z_yLw/exec"; 
     
     let employees = [];
@@ -358,7 +358,8 @@
     }
 
     function setLoading(show) {
-      document.getElementById('loadingBar').classList.toggle('active', show);
+      const bar = document.getElementById('loadingBar');
+      if (bar) bar.classList.toggle('active', show);
     }
 
     function showToast(msg, type = 'success') {
@@ -373,11 +374,10 @@
     // TAB CONTROLLER
     // -----------------------------------------------------------------
     function switchTab(idx) {
-      const buttons = document.querySelectorAll('.tab-btn');
-      const panels = document.querySelectorAll('.tab-panel');
+      const buttons = document.querySelectorAll('.tab-nav .tab-btn');
+      const panels = document.querySelectorAll('main .tab-panel');
       
       buttons.forEach((b, i) => b.classList.toggle('active', i === idx));
-      panels.forEach((p, i) => b.classList.toggle('active', i === idx)); // Fixed selection logic
       panels.forEach((p, i) => {
         if (i === idx) {
           p.style.display = 'block';
@@ -501,7 +501,7 @@
     function loadEmpDropdown() {
       const select = document.getElementById('empSelect');
       if (!select) return;
-      select.innerHTML = '<option value="">-- ເລືອກພະນັກງານ --</option>' + 
+      select.innerHTML = '<option value="">-- ເለືອກພະນັກງານ --</option>' + 
         employees.map(e => `<option value="${esc(e.name)}">${esc(e.name)}</option>`).join('');
     }
 
