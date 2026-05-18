@@ -55,7 +55,6 @@
     .summary-table th, .summary-table td { padding: 12px; border-bottom: 1px solid var(--border); }
     .summary-table th { background-color: #0f172a; color: var(--text-muted); }
     
-    /* 👥 Grouped Style - ປັບປຸງໃໝ່ໃຫ້ສະແດງຮູບ ແລະ ວັນທີຖືກຕ້ອງ */
     .emp-group-card { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
     .emp-group-header { background: #1e293b; padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); }
     .group-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #334155; }
@@ -63,14 +62,14 @@
     .group-info p { font-size: 13px; color: var(--text-muted); }
     .att-sub-item { padding: 14px 15px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
     .att-sub-item:last-child { border-bottom: none; }
-    .badge { padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; text-align: center; min-width: 60px; }
+    .badge { padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; text-align: center; min-width: 70px; }
     .badge.Present { background: rgba(16, 185, 129, 0.2); color: #34d399; }
     .badge.Absent { background: rgba(239, 68, 68, 0.2); color: #f87171; }
     .badge.Late { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
     .btn-del-icon { background: none; border: none; color: #f87171; cursor: pointer; font-size: 16px; padding: 5px; }
 
     .employee-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
-    .profile-card { background: var(--bg-card); border-radius: 14px; padding: 16px; border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; position: relative; }
+    .profile-card { background: var(--bg-card); border-radius: 14px; padding: 16px; border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
     .profile-img-circle { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #334155; }
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: #1e293b; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
     .nav-item { background: none; border: none; flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; font-size: 12px; }
@@ -103,7 +102,7 @@
               <tr>
                 <th id="th-name">ຊື່ພະນັກງານ</th>
                 <th id="th-present">ມາ (Present)</th>
-                <th id="th-absent">າດ (Absent)</th>
+                <th id="th-absent">ຂາດ (Absent)</th>
                 <th id="th-late">ສາຍ (Late)</th>
               </tr>
             </thead>
@@ -166,7 +165,7 @@
             <div class="form-group"><label id="ui-emp-phone">ເບີໂທ:</label><input type="text" id="empPhone" required></div>
             <div class="form-group"><label id="ui-emp-village">ບ້ານ:</label><input type="text" id="empVillage"></div>
             <div class="form-group"><label id="ui-emp-district">ເມືອງ:</label><input type="text" id="empDistrict"></div>
-            <div class="form-group"><label id="ui-emp-province">ແਖວງ:</label><input type="text" id="empProvince"></div>
+            <div class="form-group"><label id="ui-emp-province">ແແຂວງ:</label><input type="text" id="empProvince"></div>
             <div class="form-group"><label id="ui-emp-dept">ພະແນກ:</label><input type="text" id="empDept"></div>
             <div class="form-group"><label id="ui-emp-pos">ຕຳແໜ່ງ:</label><input type="text" id="empPos"></div>
             <div class="form-group" style="grid-column: 1 / -1;"><label id="ui-emp-img">ຮູບໂປຣໄຟລ໌:</label><input type="file" id="empImageFile" accept="image/*"></div>
@@ -184,8 +183,6 @@
   </nav>
 
   <script>
-    const API = "https://script.google.com/macros/s/AKfycbwkgZI1JqULFpxl5oGN1-hnVH_sLqL70pS_vma_0enW9W02Ubgg1W3OYGKtZiC5R27esw/exec";
-    
     const langData = {
       lo: {
         appTitle: "📅 ລະບົບຈັດການລາຍຊື່ ແລະ ເວລາມາວຽກ", navAtt: "ບັນທຶກວຽກ", navEmp: "ພະນັກງານ",
@@ -194,7 +191,7 @@
         btnSaveAtt: "+ ບັນທຶກເວລາມາວຽກ", searchPlace: "🔍 ຄົ້ນຫາຊື່ພະນັກງານ...", titleAddEmp: "➕ ເພີ່ມພະນັກງານໃໝ່",
         empId: "ລະຫັດພະນັກງານ:", empName: "ຊື່ ແລະ ນາມສະກຸນ:", empPhone: "ເບີໂທ:", btnSaveEmp: "+ ເພີ່ມພະນັກງານ",
         optPresent: "Present (ມາ)", optAbsent: "Absent (ຂາດ)", optLate: "Late (ສາຍ)", statusPresent: "ມາ", statusAbsent: "ຂາດ", statusLate: "ສາຍ",
-        confirmDel: "ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບ?", alertSuccess: "ດໍາເນີນການສໍາເລັດ!"
+        confirmDel: "ທ່ານແנ່ໃຈບໍ່ວ່າຕ້ອງການລຶບ?", alertSuccess: "ດໍາເນີນການສໍາເລັດ!"
       },
       en: {
         appTitle: "📅 Attendance System", navAtt: "Attendance", navEmp: "Employees",
@@ -265,14 +262,18 @@
     function buildDashboardSummary() {
       const body = document.getElementById('dashboardSummaryBody'); if (!body) return;
       let summaryMap = {};
-      employees.forEach(e => { summaryMap[e.id] = { name: e.name, p: 0, a: 0, l: 0 }; });
+      
+      employees.forEach(e => { summaryMap[String(e.id).trim()] = { name: e.name, p: 0, a: 0, l: 0 }; });
+      
       attendance.forEach(a => {
-        if (summaryMap[a.id]) {
-          if (a.status === 'Present') summaryMap[a.id].p++;
-          if (a.status === 'Absent') summaryMap[a.id].a++;
-          if (a.status === 'Late') summaryMap[a.id].l++;
+        const empIdClean = String(a.id).trim();
+        if (summaryMap[empIdClean]) {
+          if (a.status === 'Present') summaryMap[empIdClean].p++;
+          if (a.status === 'Absent') summaryMap[empIdClean].a++;
+          if (a.status === 'Late') summaryMap[empIdClean].l++;
         }
       });
+      
       body.innerHTML = Object.keys(summaryMap).map(id => `<tr>
         <td><strong>${esc(summaryMap[id].name)}</strong> <span style="color:var(--text-muted); font-size:11px;">(${esc(id)})</span></td>
         <td style="color:#34d399; font-weight:bold;">${summaryMap[id].p} ມື້</td>
@@ -307,7 +308,7 @@
       for (let empId in groups) {
         let group = groups[empId];
         
-        // ລຽງລໍາດັບວັນທີຈາກໃໝ່ຫາເກົ່າ ໃຫ້ເຫັນຂໍ້ມູນຫຼ້າສຸດຢູ່ເທິງ
+        // ລຽງລໍາດັບວັນທີໃຫ້ເຫັນຂໍ້ມູນຫຼ້າສຸດຢູ່ເທິງ
         group.records.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         html += `<div class="emp-group-card">
@@ -320,7 +321,7 @@
               let displayStatus = r.status === 'Present' ? l.statusPresent : (r.status === 'Absent' ? l.statusAbsent : l.statusLate);
               return `<div class="att-sub-item">
                 <div>
-                  <strong>📅 ວັນທີ: ${esc(r.date)}</strong> | ⏰ ເວລາ: ${esc(r.time || '08:00 - 17:30')}
+                  <strong>📅 ວັນທີ: ${esc(r.date)}</strong> | ⏰ ເວລາ: ${esc(r.time)}
                   ${r.remarks ? `<br><span style="color:#3b82f6; font-size:12px;">📝 ໝາຍເຫດ: ${esc(r.remarks)}</span>` : ''}
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
@@ -348,7 +349,7 @@
         await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'addAttendance', id, name, date, status, time, remarks }) });
         alert(langData[currentLang].alertSuccess); 
         document.getElementById('remarksInput').value = ""; 
-        setTimeout(fetchData, 1500); // ລໍຖ້າໃຫ້ Google Sheet ອັບເດດແລ້ວດຶງຂໍ້ມູນໃໝ່
+        setTimeout(fetchData, 1500);
       } catch (err) { console.error(err); setLoading(false); }
     }
 
