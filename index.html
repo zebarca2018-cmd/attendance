@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Technical Department — Employee Attendance</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1a1f2e 0%, #0d1b2a 100%);
+      border-bottom: 1px solid #1e3a5f;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    header h1 { font-size: 1.4rem; font-weight: 600; color: #f1f5f9; }
+    header p  { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+
+    /* ── Tab Navigation ── */
+    .tab-nav {
+      background: #1a1f2e;
+      border-bottom: 1px solid #1e293b;
+      display: flex;
+      padding: 0 32px;
+      gap: 2px;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: #64748b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 14px 18px 12px;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: #94a3b8; }
+    .tab-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+    .tab-chip {
+      width: 22px; height: 22px;
+      background: #1e293b;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      line-height: 1;
+    }
+    .tab-btn.active .tab-chip { background: rgba(59,130,246,0.18); }
+
+    /* ── Tab Panels ── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Main layout ── */
+    main {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #1a1f2e;
+      border: 1px solid #1e293b;
+      border-radius: 14px;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+    }
+    .card-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #3b82f6;
+      margin-bottom: 20px;
+    }
+
+    /* ── Form shared ── */
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      letter-spacing: 0.02em;
+    }
+    input[type="text"],
+    input[type="tel"],
+    input[type="date"],
+    select {
+      width: 100%;
+      background: #0f1117;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 0.9rem;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.6); cursor: pointer; }
+    input:focus, select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
+    input::placeholder { color: #334155; }
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: #64748b;
+      pointer-events: none;
+      font-size: 12px;
+    }
+    select option { background: #1a1f2e; }
+
+    /* ── Attendance entry form ── */
+    .att-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 16px;
+      align-items: end;
+    }
+    @media (max-width: 720px) { .att-form-grid { grid-template-columns: 1fr; } }
+
+    /* ── Buttons ── */
+    .btn-save {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 24px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s, transform 0.1s;
+      display: flex; align-items: center; gap: 8px;
+      height: 42px;
+    }
+    .btn-save:hover { opacity: 0.9; }
+    .btn-save:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: #fff;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      padding: 11px 26px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:active { transform: scale(0.97); }
+
+    .btn-ghost {
+      background: none;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 10px 20px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: #3b82f6; color: #3b82f6; }
+
+    .btn-del {
+      background: none;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 13px;
+      padding: 4px 8px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-del:hover { border-color: #ef4444; color: #ef4444; }
+
+    /* ── Stats ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-box {
+      background: #1a1f2e;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 18px 22px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .stat-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .stat-dot.present { background: #22c55e; box-shadow: 0 0 8px #22c55e88; }
+    .stat-dot.absent  { background: #ef4444; box-shadow: 0 0 8px #ef444488; }
+    .stat-dot.late    { background: #f59e0b; box-shadow: 0 0 8px #f59e0b88; }
+    .stat-count { font-size: 1.6rem; font-weight: 700; color: #f1f5f9; line-height: 1; }
+    .stat-label { font-size: 0.75rem; color: #64748b; margin-top: 3px; }
+
+    /* ── Table shared ── */
+    .tbl-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .tbl-header h2 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #3b82f6;
+    }
+    .pill {
+      font-size: 0.78rem;
+      color: #64748b;
+      background: #0f1117;
+      border: 1px solid #1e293b;
+      border-radius: 20px;
+      padding: 3px 12px;
+    }
+    .tbl-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid #1e293b;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    thead th {
+      background: #0f1117;
+      color: #64748b;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 13px 18px;
+      text-align: left;
+      border-bottom: 1px solid #1e293b;
+    }
+    tbody tr { border-bottom: 1px solid #1e293b; transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #0f1117; }
+    tbody td { padding: 13px 18px; color: #cbd5e1; vertical-align: middle; }
+    td.name { font-weight: 500; color: #f1f5f9; }
+    td.muted { color: #64748b; font-size: 0.8rem; }
+
+    /* ── Status badge ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; }
+    .badge.Present { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
+    .badge.Present::before { background: #22c55e; }
+    .badge.Absent  { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
+    .badge.Absent::before  { background: #ef4444; }
+    .badge.Late    { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); }
+    .badge.Late::before    { background: #f59e0b; }
+
+    /* ── Monthly Summary selectors ── */
+    .summary-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .summary-selectors { display: flex; gap: 12px; align-items: flex-end; }
+    .summary-selectors > div { min-width: 140px; }
+
+    .num-present { color: #22c55e; font-weight: 600; }
+    .num-absent  { color: #ef4444; font-weight: 600; }
+    .num-late    { color: #f59e0b; font-weight: 600; }
+    .num-total   { color: #94a3b8; font-weight: 500; }
+
+    .att-bar {
+      display: flex;
+      height: 6px;
+      border-radius: 4px;
+      overflow: hidden;
+      background: #0f1117;
+      min-width: 80px;
+      gap: 1px;
+    }
+    .att-bar span { height: 100%; border-radius: 2px; }
+    .att-bar .bar-p { background: #22c55e; }
+    .att-bar .bar-a { background: #ef4444; }
+    .att-bar .bar-l { background: #f59e0b; }
+
+    /* ── Employee form ── */
+    .emp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .emp-grid .span2 { grid-column: 1 / -1; }
+
+    .addr-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .addr-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #475569;
+      margin-bottom: 2px;
+    }
+
+    /* Profile picture upload */
+    .upload-box {
+      position: relative;
+      background: #0f1117;
+      border: 1.5px dashed #1e293b;
+      border-radius: 10px;
+      cursor: pointer;
+      min-height: 104px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .upload-box:hover { border-color: #3b82f6; }
+    .upload-box input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+      font-size: 0;
+    }
+    .upload-ph {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+    }
+    .upload-ph-icon { font-size: 1.7rem; color: #334155; }
+    .upload-ph-hint { font-size: 0.72rem; color: #475569; }
+    .upload-preview {
+      display: none;
+      pointer-events: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .upload-preview img {
+      width: 62px; height: 62px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #3b82f6;
+    }
+    .upload-preview span {
+      font-size: 0.7rem;
+      color: #3b82f6;
+    }
+
+    .emp-form-actions {
+      margin-top: 24px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* Employee table */
+    .emp-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #1e3a5f;
+      flex-shrink: 0;
+    }
+    .emp-avatar-ph {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: #1e293b;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    td.avatar-col { width: 44px; padding-right: 4px; }
+
+    .plate-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+      background: #0f1117;
+      border: 1px solid #1e293b;
+      border-radius: 4px;
+      padding: 2px 8px;
+      color: #94a3b8;
+      letter-spacing: 0.06em;
+    }
+
+    @media (max-width: 680px) {
+      .emp-grid { grid-template-columns: 1fr; }
+      .emp-grid .span2 { grid-column: 1; }
+      .addr-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Loading bar ── */
+    .loading-bar {
+      height: 3px;
+      background: #1e293b;
+      overflow: hidden;
+      display: none;
+    }
+    .loading-bar.active { display: block; }
+    .loading-bar-inner {
+      height: 100%;
+      width: 38%;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+      background-size: 200% 100%;
+      border-radius: 2px;
+      animation: loadSlide 1.3s ease-in-out infinite;
+    }
+    @keyframes loadSlide {
+      0%   { transform: translateX(-160%); }
+      100% { transform: translateX(420%); }
+    }
+
+    /* ── Sync indicator ── */
+    .sync-status {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+    .sync-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #334155;
+      transition: background 0.3s, box-shadow 0.3s;
+      flex-shrink: 0;
+    }
+    .sync-dot.ok     { background: #22c55e; box-shadow: 0 0 6px #22c55e88; }
+    .sync-dot.busy   { background: #f59e0b; box-shadow: 0 0 6px #f59e0b88; animation: pulse 1s ease-in-out infinite; }
+    .sync-dot.err    { background: #ef4444; box-shadow: 0 0 6px #ef444488; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    .sync-text { font-size: 0.73rem; color: #475569; white-space: nowrap; }
+
+    /* Disabled button state during loading */
+    button:disabled { opacity: 0.55 !important; cursor: not-allowed !important; transform: none !important; }
+
+    /* ── Empty state ── */
+    .empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: #334155;
+    }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .empty p { font-size: 0.9rem; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      background: #1a1f2e;
+      border: 1px solid #22c55e44;
+      color: #22c55e;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 12px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.45);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">🖥️</div>
+  <div>
+    <h1>Technical Department</h1>
+    <p>Employee Attendance Management System</p>
+  </div>
+  <div class="sync-status">
+    <div class="sync-dot" id="syncDot"></div>
+    <span class="sync-text" id="syncText">Connecting…</span>
+  </div>
+</header>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab(0)">
+    <span class="tab-chip">📅</span> Attendance Tracking
+  </button>
+  <button class="tab-btn" onclick="switchTab(1)">
+    <span class="tab-chip">👥</span> Employee Management
+  </button>
+</nav>
+
+<div class="loading-bar" id="loadingBar"><div class="loading-bar-inner"></div></div>
+
+<main>
+
+  <!-- ═══════════════════════════
+       TAB 0 — Attendance Tracking
+  ════════════════════════════ -->
+  <div class="tab-panel active" id="tab0">
+
+    <!-- Entry Form -->
+    <div class="card">
+      <div class="card-title">New Attendance Entry</div>
+      <div class="att-form-grid">
+        <div>
+          <label for="empSelect">Employee</label>
+          <div class="select-wrap">
+            <select id="empSelect">
+              <option value="">— Select Employee —</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="attDate">Date</label>
+          <input type="date" id="attDate" />
+        </div>
+        <div>
+          <label for="attStatus">Status</label>
+          <div class="select-wrap">
+            <select id="attStatus">
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+              <option value="Late">Late</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <button class="btn-save" onclick="saveRecord()">＋ Save Record</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overall Stats -->
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-dot present"></div>
+        <div>
+          <div class="stat-count" id="countPresent">0</div>
+          <div class="stat-label">Present</div>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-dot absent"></div>
+        <div>
+          <div class="stat-count" id="countAbsent">0</div>
+          <div class="stat-label">Absent</div>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-dot late"></div>
+        <div>
+          <div class="stat-count" id="countLate">0</div>
+          <div class="stat-label">Late</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attendance Records Table -->
+    <div class="card">
+      <div class="tbl-header">
+        <h2>Attendance Records</h2>
+        <span class="pill" id="totalCount">0 records</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Employee Name</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Logged At</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="attBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Monthly Summary -->
+    <div class="card">
+      <div class="summary-bar">
+        <div class="card-title" style="margin-bottom:0">Monthly Summary</div>
+        <div class="summary-selectors">
+          <div>
+            <label for="sumMonth">Month</label>
+            <div class="select-wrap">
+              <select id="sumMonth" onchange="renderSummary()">
+                <option value="0">January</option><option value="1">February</option>
+                <option value="2">March</option><option value="3">April</option>
+                <option value="4">May</option><option value="5">June</option>
+                <option value="6">July</option><option value="7">August</option>
+                <option value="8">September</option><option value="9">October</option>
+                <option value="10">November</option><option value="11">December</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label for="sumYear">Year</label>
+            <div class="select-wrap">
+              <select id="sumYear" onchange="renderSummary()"></select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Employee Name</th>
+              <th>Present</th>
+              <th>Absent</th>
+              <th>Late</th>
+              <th>Total Days</th>
+              <th>Attendance</th>
+            </tr>
+          </thead>
+          <tbody id="summaryBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /tab0 -->
+
+
+  <!-- ═══════════════════════════════
+       TAB 1 — Employee Management
+  ════════════════════════════════ -->
+  <div class="tab-panel" id="tab1">
+
+    <!-- Registration Form -->
+    <div class="card">
+      <div class="card-title">Register New Employee</div>
+      <div class="emp-grid">
+
+        <div>
+          <label for="empFullName">Full Name <span style="color:#ef4444">*</span></label>
+          <input type="text" id="empFullName" placeholder="e.g. Alice Johnson" />
+        </div>
+
+        <div>
+          <label for="empPhone">Phone Number</label>
+          <input type="tel" id="empPhone" placeholder="e.g. 020 555 1234" />
+        </div>
+
+        <div>
+          <label for="empPlate">Vehicle License Plate</label>
+          <input type="text" id="empPlate" placeholder="e.g. 1A-1234" />
+        </div>
+
+        <div>
+          <label>Profile Picture</label>
+          <div class="upload-box" id="uploadBox">
+            <input type="file" id="photoInput" accept="image/*" />
+            <div class="upload-ph" id="uploadPh">
+              <div class="upload-ph-icon">📷</div>
+              <div class="upload-ph-hint">Click to upload a photo</div>
+            </div>
+            <div class="upload-preview" id="uploadPreview">
+              <img id="previewImg" src="" alt="Preview" />
+              <span>Photo selected ✓</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="span2">
+          <div class="addr-label">Current Address</div>
+          <div class="addr-grid">
+            <div>
+              <label for="empVillage">Village / Town</label>
+              <input type="text" id="empVillage" placeholder="Village" />
+            </div>
+            <div>
+              <label for="empDistrict">District</label>
+              <input type="text" id="empDistrict" placeholder="District" />
+            </div>
+            <div>
+              <label for="empProvince">Province</label>
+              <input type="text" id="empProvince" placeholder="Province" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="emp-form-actions">
+        <button class="btn-primary" onclick="saveEmployee()">＋ Register Employee</button>
+        <button class="btn-ghost" onclick="clearEmpForm()">Clear Form</button>
+      </div>
+    </div>
+
+    <!-- Employee List -->
+    <div class="card">
+      <div class="tbl-header">
+        <h2>Registered Employees</h2>
+        <span class="pill" id="empCount">0 employees</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th></th>
+              <th>Full Name</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>Plate</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="empBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /tab1 -->
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ─── API ─── */
+  const API = 'https://script.google.com/macros/s/AKfycbzqle-PQhOZDKXpu_WuhVe8zp_znBjQgjlaxskUyYVRWfxjz6e2VVCIKbvNUodTXQloCQ/exec';
+
+  /* ─── State ─── */
+  let records   = [];
+  let employees = [];
+  let pendingPhoto = '';
+  let _busy = false;
+
+  /* ─── Boot ─── */
+  document.getElementById('attDate').value  = new Date().toISOString().split('T')[0];
+  document.getElementById('sumMonth').value = new Date().getMonth();
+  document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
+
+  fetchData();
+
+  /* ─── Tab switching ─── */
+  function switchTab(idx) {
+    document.querySelectorAll('.tab-btn').forEach((b, i)  => b.classList.toggle('active', i === idx));
+    document.querySelectorAll('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+  }
+
+  /* ════════════════════════════════════════
+     API LAYER
+  ════════════════════════════════════════ */
+
+  async function fetchData() {
+    setLoading(true, 'Syncing…');
+    try {
+      const res  = await fetch(API);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      employees = Array.isArray(data.employees) ? data.employees : [];
+      records   = Array.isArray(data.attendance) ? data.attendance : [];
+
+      setSyncStatus('ok');
+    } catch (err) {
+      console.error('fetchData:', err);
+      setSyncStatus('err', 'Sync failed');
+      showToast('Could not reach the server. Check your connection.', 'error');
+    } finally {
+      setLoading(false);
+      populateYears();
+      loadEmpDropdown();
+      renderAll();
+      renderEmployees();
+    }
+  }
+
+  /* POST with Content-Type: text/plain to avoid CORS preflight.
+     Google Apps Script receives the body in e.postData.contents and
+     can parse it with JSON.parse(e.postData.contents).
+     Falls back to no-cors (fire-and-forget) if the server is unreachable. */
+  async function postData(payload) {
+    setLoading(true, 'Saving…');
+    try {
+      const res = await fetch(API, {
+        method:  'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body:    JSON.stringify(payload)
+      });
+
+      let result = {};
+      try { result = await res.json(); } catch (_) { /* non-JSON response is OK */ }
+
+      if (result.error) {
+        showToast(result.error, 'error');
+        setLoading(false);
+        return false;
+      }
+
+      await fetchData();   // refresh all data from server
+      return true;
+
+    } catch (netErr) {
+      /* CORS or network error — fall back to no-cors (opaque) send */
+      console.warn('CORS POST failed, retrying no-cors:', netErr.message);
+      try {
+        await fetch(API, {
+          method: 'POST',
+          mode:   'no-cors',
+          body:   JSON.stringify(payload)
+        });
+        /* Give the script a moment to write to the sheet before we re-fetch */
+        await new Promise(r => setTimeout(r, 1400));
+        await fetchData();
+        return true;
+      } catch (err2) {
+        console.error('postData no-cors fallback:', err2);
+        showToast('Network error — please try again.', 'error');
+        setLoading(false);
+        return false;
+      }
+    }
+  }
+
+  /* ════════════════════════════════════════
+     ATTENDANCE
+  ════════════════════════════════════════ */
+
+  async function saveRecord() {
+    const name   = document.getElementById('empSelect').value.trim();
+    const date   = document.getElementById('attDate').value;
+    const status = document.getElementById('attStatus').value;
+
+    if (!name) { showToast('Please select an employee.', 'error'); return; }
+    if (!date) { showToast('Please select a date.', 'error');      return; }
+
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const ok   = await postData({ action: 'saveAttendance', name, date, status, time });
+    if (ok) showToast(`Attendance saved for ${name}.`);
+  }
+
+  async function deleteRecord(id) {
+    const ok = await postData({ action: 'deleteAttendance', id: String(id) });
+    if (ok) showToast('Record removed.');
+  }
+
+  function renderAll() {
+    const tbody  = document.getElementById('attBody');
+    const counts = { Present: 0, Absent: 0, Late: 0 };
+    records.forEach(r => counts[r.status]++);
+
+    document.getElementById('countPresent').textContent = counts.Present;
+    document.getElementById('countAbsent').textContent  = counts.Absent;
+    document.getElementById('countLate').textContent    = counts.Late;
+    document.getElementById('totalCount').textContent   =
+      records.length + (records.length === 1 ? ' record' : ' records');
+
+    if (records.length === 0) {
+      tbody.innerHTML = emptyState('📋', 'No records yet. Add an entry above to get started.', 6);
+    } else {
+      tbody.innerHTML = records.map((r, i) => `
+        <tr>
+          <td class="muted">${records.length - i}</td>
+          <td class="name">${esc(r.name)}</td>
+          <td>${fmtDate(r.date)}</td>
+          <td><span class="badge ${esc(r.status)}">${esc(r.status)}</span></td>
+          <td class="muted">${esc(r.time || '')}</td>
+          <td><button class="btn-del" onclick="deleteRecord('${esc(String(r.id))}')" title="Remove">✕</button></td>
+        </tr>`).join('');
+    }
+
+    populateYears();
+    renderSummary();
+  }
+
+  /* ════════════════════════════════════════
+     MONTHLY SUMMARY
+  ════════════════════════════════════════ */
+
+  function populateYears() {
+    const sel   = document.getElementById('sumYear');
+    const cur   = new Date().getFullYear();
+    const years = new Set(records.map(r => r.date && r.date.split('-')[0]).filter(Boolean));
+    years.add(String(cur));
+    const prev   = sel.value || String(cur);
+    const sorted = [...years].sort((a, b) => b - a);
+    sel.innerHTML = sorted.map(y =>
+      `<option value="${y}" ${y === prev ? 'selected' : ''}>${y}</option>`
+    ).join('');
+  }
+
+  function renderSummary() {
+    const month  = parseInt(document.getElementById('sumMonth').value);
+    const year   = parseInt(document.getElementById('sumYear').value);
+    const tbody  = document.getElementById('summaryBody');
+
+    const filtered = records.filter(r => {
+      if (!r.date) return false;
+      const [y, m] = r.date.split('-').map(Number);
+      return y === year && (m - 1) === month;
+    });
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = emptyState('📊', 'No records found for this month.', 7);
+      return;
+    }
+
+    const map = {};
+    filtered.forEach(r => {
+      const key = r.name.trim().toLowerCase();
+      if (!map[key]) map[key] = { name: r.name.trim(), Present: 0, Absent: 0, Late: 0 };
+      map[key][r.status]++;
+    });
+
+    const rows = Object.values(map).sort((a, b) => a.name.localeCompare(b.name));
+    tbody.innerHTML = rows.map((e, i) => {
+      const total = e.Present + e.Absent + e.Late;
+      const pPct  = total ? (e.Present / total) * 100 : 0;
+      const aPct  = total ? (e.Absent  / total) * 100 : 0;
+      const lPct  = total ? (e.Late    / total) * 100 : 0;
+      return `
+        <tr>
+          <td class="muted">${i + 1}</td>
+          <td class="name">${esc(e.name)}</td>
+          <td class="num-present">${e.Present}</td>
+          <td class="num-absent">${e.Absent}</td>
+          <td class="num-late">${e.Late}</td>
+          <td class="num-total">${total}</td>
+          <td>
+            <div class="att-bar" title="Present ${Math.round(pPct)}% · Absent ${Math.round(aPct)}% · Late ${Math.round(lPct)}%">
+              <span class="bar-p" style="width:${pPct}%"></span>
+              <span class="bar-a" style="width:${aPct}%"></span>
+              <span class="bar-l" style="width:${lPct}%"></span>
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  /* ════════════════════════════════════════
+     EMPLOYEE MANAGEMENT
+  ════════════════════════════════════════ */
+
+  async function saveEmployee() {
+    const name     = document.getElementById('empFullName').value.trim();
+    const phone    = document.getElementById('empPhone').value.trim();
+    const plate    = document.getElementById('empPlate').value.trim().toUpperCase();
+    const village  = document.getElementById('empVillage').value.trim();
+    const district = document.getElementById('empDistrict').value.trim();
+    const province = document.getElementById('empProvince').value.trim();
+
+    if (!name) { showToast('Full name is required.', 'error'); return; }
+
+    const ok = await postData({
+      action: 'registerEmployee',
+      name, phone, plate, village, district, province,
+      photo: pendingPhoto
+    });
+
+    if (ok) {
+      showToast(`${name} registered successfully.`);
+      clearEmpForm();
+    }
+  }
+
+  async function deleteEmployee(id) {
+    const ok = await postData({ action: 'deleteEmployee', id: String(id) });
+    if (ok) showToast('Employee removed.');
+  }
+
+  function renderEmployees() {
+    const tbody = document.getElementById('empBody');
+    document.getElementById('empCount').textContent =
+      employees.length + (employees.length === 1 ? ' employee' : ' employees');
+
+    if (employees.length === 0) {
+      tbody.innerHTML = emptyState('👥', 'No employees registered yet. Use the form above to add one.', 7);
+      return;
+    }
+
+    tbody.innerHTML = employees.map((e, i) => {
+      const avatar  = e.photo
+        ? `<img src="${esc(e.photo)}" class="emp-avatar" alt="${esc(e.name)}" />`
+        : `<div class="emp-avatar-ph">👤</div>`;
+      const address = [e.village, e.district, e.province].filter(Boolean).map(esc).join(', ') || '—';
+      const plate   = e.plate ? `<span class="plate-tag">${esc(e.plate)}</span>` : '—';
+      return `
+        <tr>
+          <td class="muted">${i + 1}</td>
+          <td class="avatar-col">${avatar}</td>
+          <td class="name">${esc(e.name)}</td>
+          <td style="color:#94a3b8">${esc(e.phone || '—')}</td>
+          <td style="font-size:0.82rem;color:#64748b">${address}</td>
+          <td>${plate}</td>
+          <td><button class="btn-del" onclick="deleteEmployee('${esc(String(e.id))}')" title="Remove">✕</button></td>
+        </tr>`;
+    }).join('');
+  }
+
+  function loadEmpDropdown() {
+    const sel = document.getElementById('empSelect');
+    if (employees.length === 0) {
+      sel.innerHTML = `<option value="">— No employees registered —</option>`;
+    } else {
+      sel.innerHTML = `<option value="">— Select Employee —</option>` +
+        employees.map(e => `<option value="${esc(e.name)}">${esc(e.name)}</option>`).join('');
+    }
+  }
+
+  /* ─── Photo upload — resize to max 240 px before storing ─── */
+  function handlePhotoUpload() {
+    const file = document.getElementById('photoInput').files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 240;
+        let w = img.width, h = img.height;
+        if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
+        else        { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        pendingPhoto = canvas.toDataURL('image/jpeg', 0.82);
+        document.getElementById('previewImg').src              = pendingPhoto;
+        document.getElementById('uploadPh').style.display      = 'none';
+        document.getElementById('uploadPreview').style.display = 'flex';
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearEmpForm() {
+    ['empFullName','empPhone','empPlate','empVillage','empDistrict','empProvince']
+      .forEach(id => { document.getElementById(id).value = ''; });
+    pendingPhoto = '';
+    document.getElementById('photoInput').value              = '';
+    document.getElementById('previewImg').src                = '';
+    document.getElementById('uploadPh').style.display        = 'flex';
+    document.getElementById('uploadPreview').style.display   = 'none';
+  }
+
+  /* ─── UI helpers ─── */
+  function setLoading(state, label) {
+    _busy = state;
+    document.getElementById('loadingBar').classList.toggle('active', state);
+    document.querySelectorAll('button.btn-save, button.btn-primary, button.btn-del')
+      .forEach(b => { b.disabled = state; });
+    if (state && label) setSyncStatus('busy', label);
+  }
+
+  function setSyncStatus(type, text) {
+    const dot  = document.getElementById('syncDot');
+    const span = document.getElementById('syncText');
+    dot.className  = `sync-dot ${type}`;
+    if (text) {
+      span.textContent = text;
+    } else if (type === 'ok') {
+      const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      span.textContent = `Synced ${t}`;
+    }
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    const [y, m, d] = iso.split('-');
+    return new Date(y, m - 1, d).toLocaleDateString('en-US',
+      { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function emptyState(icon, text, cols) {
+    return `<tr><td colspan="${cols}">
+      <div class="empty">
+        <div class="empty-icon">${icon}</div>
+        <p>${text}</p>
+      </div></td></tr>`;
+  }
+
+  function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent       = msg;
+    t.style.borderColor = type === 'error' ? '#ef444444' : '#22c55e44';
+    t.style.color       = type === 'error' ? '#ef4444'   : '#22c55e';
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+</script>
+</body>
+</html>
