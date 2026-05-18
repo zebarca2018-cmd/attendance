@@ -908,17 +908,16 @@
     if (records.length === 0) {
       tbody.innerHTML = emptyState('📋', 'No records yet. Add an entry above to get started.', 6);
     } else {
-      tbody.innerHTML = records.map((r, i) => `
-        <tr>
-          <td class="muted">${records.length - i}</td>
-          <td class="name">${esc(r.name)}</td>
-          <td>${fmtDate(r.date)}</td>
-          <td><span class="badge ${esc(r.status)}">${esc(r.status)}</span></td>
-          <td class="muted">${esc(r.time || '')}</td>
-          <td><button class="btn-del" onclick="deleteRecord('${esc(String(r.id))}')" title="Remove">✕</button></td>
-        </tr>`).join('');
-    }
-
+     tbody.innerHTML = records.map((r, i) => `
+          <tr>
+            <td>${records.length - i}</td>
+            <td>${esc(r.name)}</td>
+            <td>${r.date ? new Date(r.date).toLocaleDateString('lo-LA') : ''}</td>
+            <td><span class="badge ${esc(r.status)}">${esc(r.status)}</span></td>
+            <td class="muted">${esc(r.time || '')}</td>
+            <td><button class="btn-del" onclick="deleteAttendance('${r.rowIndex}')" title="Remove">X</button></td>
+          </tr>`).join('');
+    
     populateYears();
     renderSummary();
   }
