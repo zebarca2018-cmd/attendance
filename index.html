@@ -1143,6 +1143,35 @@
     clearTimeout(t._t);
     t._t = setTimeout(() => t.classList.remove('show'), 2800);
   }
+// ຟັງຊັນໃໝ່ສຳລັບສົ່ງຄຳສັ່ງລຶບຂໍ້ມູນໄປຫາ Google Sheets
+async function deleteAttendance(rowIndex) {
+    if (!rowIndex || rowIndex === 'undefined') {
+        alert('ບໍ່ສາມາດລຶບໄດ້: ບໍ່ພົບຕຳແໜ່ງແຖວຂໍ້ມູນ');
+        return;
+    }
+    
+    if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບລາຍການມາວຽກນີ້?')) {
+        try {
+            await fetch(API, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'deleteAttendance',
+                    rowIndex: rowIndex
+                })
+            });
+            
+            alert('ສົ່ງຄຳສັ່ງລຶບຮຽບຮ້ອຍແລ້ວ! ລະບົບຈະອັບເດດໃນໜ້ອຍໜຶ່ງ.');
+            fetchData(); 
+        } catch (error) {
+            console.error('Error:', error);
+            alert('ເກີດຂໍ້ຜິດພາດໃນການລຶບຂໍ້ມູນ');
+        }
+    }
+}
 </script>
 </body>
 </html>
