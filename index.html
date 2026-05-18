@@ -791,110 +791,111 @@
 
   fetchData();
 
-  /* ─── Tab switching ─── */
-  function switchTab(idx) {
-    document.querySelectorAll('.tab-btn').forEach((b, i)  => b.classList.toggle('active', i === idx));
-    document.querySelectorAll('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+ /* —— Tab switching —— */
+function switchTab(idx) {
+  // ແກ້ໄຂໃຫ້ລະບົບຄົ້ນຫາ ແລະ ສະຫຼັບແທັບໄດ້ຢ່າງຖືກຕ້ອງ ບໍ່ໃຫ້ຕິດຂັດ
+  const buttons = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel, [id^="tab"]');
+  
+  buttons.forEach((b, i) => b.classList.toggle('active', i === idx));
+  panels.forEach((p, i) => {
+    if (i === idx) {
+      p.style.display = 'block';
+      p.classList.add('active');
+    } else {
+      p.style.display = 'none';
+      p.classList.remove('active');
+    }
+  });
+}
+
+/* ———————————————————————————————————————————————————————————————
+   API LAYER
+   ——————————————————————————————————————————————————————————————— */
+async function fetchData() {
+  setLoading(true, 'Syncing...');
+  try {
+    const res = await fetch(API);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    employees = Array.isArray(data.employees) ? data.employees : [];
+    records   = Array.isArray(data.attendance) ? data.attendance : [];
+
+    setSyncStatus('ok');
+  } catch (err) {
+    console.error('fetchData:', err);
+    setSyncStatus('err', 'Sync failed');
+    showToast('Could not reach the server. Check your connection.', 'error');
+  } finally {
+    setLoading(false);
+    populateYears();
+    loadEmpDropdown();
+    renderAll();
+    renderEmployees();
   }
+}
 
-  /* ════════════════════════════════════════
-     API LAYER
-  ════════════════════════════════════════ */
+async function postData(payload) {
+  setLoading(true, 'Saving...');
+  try {
+    const res = await fetch(API, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    showToast('Saved successfully!', 'success');
+    await fetchData();
+  } catch (err) {
+    console.error('postData:', err);
+    showToast('Save failed', 'error');
+  } finally {
+    setLoading(false);
+  }
+}
 
-  async function fetchData() {
-    setLoading(true, 'Syncing…');
+/* ຟັງຊັນໃໝ່ສຳລັບສົ່ງຄຳສັ່ງລຶບຂໍ້ມູນໄປຫາ Google Sheets ໂດຍໃຊ້ Row Index */
+async function deleteAttendance(rowIndex) {
+  if (!rowIndex || rowIndex === 'undefined') {
+    alert('ບໍ່ສາມາດລຶບໄດ້: ບໍ່ພົບຕຳແໜ່ງແຖວຂໍ້ມູນ');
+    return;
+  }
+  
+  if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບລາຍການມາວຽກນີ້?')) {
     try {
-      const res  = await fetch(API);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-
-      employees = Array.isArray(data.employees) ? data.employees : [];
-      records   = Array.isArray(data.attendance) ? data.attendance : [];
-
-      setSyncStatus('ok');
-    } catch (err) {
-      console.error('fetchData:', err);
-      setSyncStatus('err', 'Sync failed');
-      showToast('Could not reach the server. Check your connection.', 'error');
+      setLoading(true, 'Deleting...');
+      await fetch(API, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'deleteAttendance',
+          rowIndex: rowIndex
+        })
+      });
+      
+      alert('ສົ່ງຄຳສັ່ງລຶບຮຽບຮ້ອຍແລ້ວ!');
+      await fetchData(); 
+    } catch (error) {
+      console.error('Error:', error);
+      alert('ເກີດຂໍ້ຜິດພາດໃນການລຶບຂໍ້ມູນ');
     } finally {
       setLoading(false);
-      populateYears();
-      loadEmpDropdown();
-      renderAll();
-      renderEmployees();
     }
   }
+}
 
-  /* POST with Content-Type: text/plain to avoid CORS preflight.
-     Google Apps Script receives the body in e.postData.contents and
-     can parse it with JSON.parse(e.postData.contents).
-     Falls back to no-cors (fire-and-forget) if the server is unreachable. */
-  async function postData(payload) {
-    setLoading(true, 'Saving…');
-    try {
-      const res = await fetch(API, {
-        method:  'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body:    JSON.stringify(payload)
-      });
-
-      let result = {};
-      try { result = await res.json(); } catch (_) { /* non-JSON response is OK */ }
-
-      if (result.error) {
-        showToast(result.error, 'error');
-        setLoading(false);
-        return false;
-      }
-
-      await fetchData();   // refresh all data from server
-      return true;
-
-    } catch (netErr) {
-      /* CORS or network error — fall back to no-cors (opaque) send */
-      console.warn('CORS POST failed, retrying no-cors:', netErr.message);
-      try {
-        await fetch(API, {
-          method: 'POST',
-          mode:   'no-cors',
-          body:   JSON.stringify(payload)
-        });
-        /* Give the script a moment to write to the sheet before we re-fetch */
-        await new Promise(r => setTimeout(r, 1400));
-        await fetchData();
-        return true;
-      } catch (err2) {
-        console.error('postData no-cors fallback:', err2);
-        showToast('Network error — please try again.', 'error');
-        setLoading(false);
-        return false;
-      }
-    }
+async function deleteEmployee(id) {
+  if (confirm('Are you sure you want to delete this employee?')) {
+    await postData({ action: 'deleteEmployee', id });
   }
+}
 
-  /* ════════════════════════════════════════
-     ATTENDANCE
-  ════════════════════════════════════════ */
-
-  async function saveRecord() {
-    const name   = document.getElementById('empSelect').value.trim();
-    const date   = document.getElementById('attDate').value;
-    const status = document.getElementById('attStatus').value;
-
-    if (!name) { showToast('Please select an employee.', 'error'); return; }
-    if (!date) { showToast('Please select a date.', 'error');      return; }
-
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const ok   = await postData({ action: 'saveAttendance', name, date, status, time });
-    if (ok) showToast(`Attendance saved for ${name}.`);
-  }
-
-  async function deleteRecord(id) {
-    const ok = await postData({ action: 'deleteAttendance', id: String(id) });
-    if (ok) showToast('Record removed.');
-  }
-
- function renderAll() {
+/* ———————————————————————————————————————————————————————————————
+   RENDER LAYER
+   ——————————————————————————————————————————————————————————————— */
+function renderAll() {
   const tbody = document.getElementById('attendanceBody');
   if (!tbody) return;
 
@@ -904,15 +905,11 @@
   }
 
   tbody.innerHTML = records.map((r, i) => {
-    // ແປງຮູບແບບວັນທີໃຫ້ອ່ານໄດ້ງ່າຍ ແລະ ບໍ່ຂຶ້ນ Invalid Date
+    // ແກ້ໄຂບັນຫາ Invalid Date ໂດຍການກວດເຊັກຄ່າກ່ອນສະແດງຜົນ
     let displayDate = '';
     if (r.date) {
       const d = new Date(r.date);
-      if (!isNaN(d.getTime())) {
-        displayDate = d.toLocaleDateString('lo-LA');
-      } else {
-        displayDate = r.date; // ຖ້າແປງບໍ່ໄດ້ໃຫ້ສະແດງຄ່າເດີມຈາກ Sheet
-      }
+      displayDate = !isNaN(d.getTime()) ? d.toLocaleDateString('lo-LA') : r.date;
     }
 
     return `
@@ -929,258 +926,21 @@
     `;
   }).join('');
 }
-    populateYears();
-    renderSummary();
-  }
 
-  /* ════════════════════════════════════════
-     MONTHLY SUMMARY
-  ════════════════════════════════════════ */
-
-  function populateYears() {
-    const sel   = document.getElementById('sumYear');
-    const cur   = new Date().getFullYear();
-    const years = new Set(records.map(r => r.date && r.date.split('-')[0]).filter(Boolean));
-    years.add(String(cur));
-    const prev   = sel.value || String(cur);
-    const sorted = [...years].sort((a, b) => b - a);
-    sel.innerHTML = sorted.map(y =>
-      `<option value="${y}" ${y === prev ? 'selected' : ''}>${y}</option>`
-    ).join('');
-  }
-
-  function renderSummary() {
-    const month  = parseInt(document.getElementById('sumMonth').value);
-    const year   = parseInt(document.getElementById('sumYear').value);
-    const tbody  = document.getElementById('summaryBody');
-
-    const filtered = records.filter(r => {
-      if (!r.date) return false;
-      const [y, m] = r.date.split('-').map(Number);
-      return y === year && (m - 1) === month;
-    });
-
-    if (filtered.length === 0) {
-      tbody.innerHTML = emptyState('📊', 'No records found for this month.', 7);
-      return;
-    }
-
-    const map = {};
-    filtered.forEach(r => {
-      const key = r.name.trim().toLowerCase();
-      if (!map[key]) map[key] = { name: r.name.trim(), Present: 0, Absent: 0, Late: 0 };
-      map[key][r.status]++;
-    });
-
-    const rows = Object.values(map).sort((a, b) => a.name.localeCompare(b.name));
-    tbody.innerHTML = rows.map((e, i) => {
-      const total = e.Present + e.Absent + e.Late;
-      const pPct  = total ? (e.Present / total) * 100 : 0;
-      const aPct  = total ? (e.Absent  / total) * 100 : 0;
-      const lPct  = total ? (e.Late    / total) * 100 : 0;
-      return `
-        <tr>
-          <td class="muted">${i + 1}</td>
-          <td class="name">${esc(e.name)}</td>
-          <td class="num-present">${e.Present}</td>
-          <td class="num-absent">${e.Absent}</td>
-          <td class="num-late">${e.Late}</td>
-          <td class="num-total">${total}</td>
-          <td>
-            <div class="att-bar" title="Present ${Math.round(pPct)}% · Absent ${Math.round(aPct)}% · Late ${Math.round(lPct)}%">
-              <span class="bar-p" style="width:${pPct}%"></span>
-              <span class="bar-a" style="width:${aPct}%"></span>
-              <span class="bar-l" style="width:${lPct}%"></span>
-            </div>
-          </td>
-        </tr>`;
-    }).join('');
-  }
-
-  /* ════════════════════════════════════════
-     EMPLOYEE MANAGEMENT
-  ════════════════════════════════════════ */
-
-  async function saveEmployee() {
-    const name     = document.getElementById('empFullName').value.trim();
-    const phone    = document.getElementById('empPhone').value.trim();
-    const plate    = document.getElementById('empPlate').value.trim().toUpperCase();
-    const village  = document.getElementById('empVillage').value.trim();
-    const district = document.getElementById('empDistrict').value.trim();
-    const province = document.getElementById('empProvince').value.trim();
-
-    if (!name) { showToast('Full name is required.', 'error'); return; }
-
-    const ok = await postData({
-      action: 'registerEmployee',
-      name, phone, plate, village, district, province,
-      photo: pendingPhoto
-    });
-
-    if (ok) {
-      showToast(`${name} registered successfully.`);
-      clearEmpForm();
-    }
-  }
-
-  async function deleteEmployee(id) {
-    const ok = await postData({ action: 'deleteEmployee', id: String(id) });
-    if (ok) showToast('Employee removed.');
-  }
-
-  function renderEmployees() {
-    const tbody = document.getElementById('empBody');
-    document.getElementById('empCount').textContent =
-      employees.length + (employees.length === 1 ? ' employee' : ' employees');
-
-    if (employees.length === 0) {
-      tbody.innerHTML = emptyState('👥', 'No employees registered yet. Use the form above to add one.', 7);
-      return;
-    }
-
-    tbody.innerHTML = employees.map((e, i) => {
-      const avatar  = e.photo
-        ? `<img src="${esc(e.photo)}" class="emp-avatar" alt="${esc(e.name)}" />`
-        : `<div class="emp-avatar-ph">👤</div>`;
-      const address = [e.village, e.district, e.province].filter(Boolean).map(esc).join(', ') || '—';
-      const plate   = e.plate ? `<span class="plate-tag">${esc(e.plate)}</span>` : '—';
-      return `
-        <tr>
-          <td class="muted">${i + 1}</td>
-          <td class="avatar-col">${avatar}</td>
-          <td class="name">${esc(e.name)}</td>
-          <td style="color:#94a3b8">${esc(e.phone || '—')}</td>
-          <td style="font-size:0.82rem;color:#64748b">${address}</td>
-          <td>${plate}</td>
-          <td><button class="btn-del" onclick="deleteEmployee('${esc(String(e.id))}')" title="Remove">✕</button></td>
-        </tr>`;
-    }).join('');
-  }
-
-  function loadEmpDropdown() {
-    const sel = document.getElementById('empSelect');
-    if (employees.length === 0) {
-      sel.innerHTML = `<option value="">— No employees registered —</option>`;
-    } else {
-      sel.innerHTML = `<option value="">— Select Employee —</option>` +
-        employees.map(e => `<option value="${esc(e.name)}">${esc(e.name)}</option>`).join('');
-    }
-  }
-
-  /* ─── Photo upload — resize to max 240 px before storing ─── */
-  function handlePhotoUpload() {
-    const file = document.getElementById('photoInput').files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const img = new Image();
-      img.onload = () => {
-        const MAX = 240;
-        let w = img.width, h = img.height;
-        if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
-        else        { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        pendingPhoto = canvas.toDataURL('image/jpeg', 0.82);
-        document.getElementById('previewImg').src              = pendingPhoto;
-        document.getElementById('uploadPh').style.display      = 'none';
-        document.getElementById('uploadPreview').style.display = 'flex';
-      };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function clearEmpForm() {
-    ['empFullName','empPhone','empPlate','empVillage','empDistrict','empProvince']
-      .forEach(id => { document.getElementById(id).value = ''; });
-    pendingPhoto = '';
-    document.getElementById('photoInput').value              = '';
-    document.getElementById('previewImg').src                = '';
-    document.getElementById('uploadPh').style.display        = 'flex';
-    document.getElementById('uploadPreview').style.display   = 'none';
-  }
-
-  /* ─── UI helpers ─── */
-  function setLoading(state, label) {
-    _busy = state;
-    document.getElementById('loadingBar').classList.toggle('active', state);
-    document.querySelectorAll('button.btn-save, button.btn-primary, button.btn-del')
-      .forEach(b => { b.disabled = state; });
-    if (state && label) setSyncStatus('busy', label);
-  }
-
-  function setSyncStatus(type, text) {
-    const dot  = document.getElementById('syncDot');
-    const span = document.getElementById('syncText');
-    dot.className  = `sync-dot ${type}`;
-    if (text) {
-      span.textContent = text;
-    } else if (type === 'ok') {
-      const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      span.textContent = `Synced ${t}`;
-    }
-  }
-
-  function fmtDate(iso) {
-    if (!iso) return '—';
-    const [y, m, d] = iso.split('-');
-    return new Date(y, m - 1, d).toLocaleDateString('en-US',
-      { year: 'numeric', month: 'short', day: 'numeric' });
-  }
-
-  function esc(s) {
-    return String(s)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  function emptyState(icon, text, cols) {
-    return `<tr><td colspan="${cols}">
-      <div class="empty">
-        <div class="empty-icon">${icon}</div>
-        <p>${text}</p>
-      </div></td></tr>`;
-  }
-
-  function showToast(msg, type) {
-    const t = document.getElementById('toast');
-    t.textContent       = msg;
-    t.style.borderColor = type === 'error' ? '#ef444444' : '#22c55e44';
-    t.style.color       = type === 'error' ? '#ef4444'   : '#22c55e';
-    t.classList.add('show');
-    clearTimeout(t._t);
-    t._t = setTimeout(() => t.classList.remove('show'), 2800);
-  }
-// ຟັງຊັນໃໝ່ສຳລັບສົ່ງຄຳສັ່ງລຶບຂໍ້ມູນໄປຫາ Google Sheets
-async function deleteAttendance(rowIndex) {
-    if (!rowIndex || rowIndex === 'undefined') {
-        alert('ບໍ່ສາມາດລຶບໄດ້: ບໍ່ພົບຕຳແໜ່ງແຖວຂໍ້ມູນ');
-        return;
-    }
-    
-    if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບລາຍການມາວຽກນີ້?')) {
-        try {
-            await fetch(API, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'deleteAttendance',
-                    rowIndex: rowIndex
-                })
-            });
-            
-            alert('ສົ່ງຄຳສັ່ງລຶບຮຽບຮ້ອຍແລ້ວ! ລະບົບຈະອັບເດດໃນໜ້ອຍໜຶ່ງ.');
-            fetchData(); 
-        } catch (error) {
-            console.error('Error:', error);
-            alert('ເກີດຂໍ້ຜິດພາດໃນການລຶບຂໍ້ມູນ');
-        }
-    }
+function renderEmployees() {
+  const tbody = document.getElementById('employeeBody');
+  if (!tbody) return;
+  tbody.innerHTML = employees.map((emp, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${esc(emp.id)}</td>
+      <td>${esc(emp.name)}</td>
+      <td>${esc(emp.dept || '')}</td>
+      <td>
+        <button class="btn-del" onclick="deleteEmployee('${esc(emp.id)}')" title="Delete">X</button>
+      </td>
+    </tr>
+  `).join('');
 }
 </script>
 </body>
