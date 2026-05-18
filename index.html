@@ -9,14 +9,14 @@
        BASE STYLES & THEME
        ----------------------------------------------------------------- */
     :root {
-      --bg-main: #f4f6f9;
+      --bg-main: #f8fafc;
       --bg-card: #ffffff;
-      --text-main: #2d3748;
-      --text-muted: #718096;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
       --primary: #4f46e5;
       --primary-hover: #4338ca;
       --border: #e2e8f0;
-      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
       
       --c-present: #10b981;
       --c-absent: #ef4444;
@@ -28,369 +28,413 @@
       font-family: 'Noto Sans Lao', system-ui, -apple-system, sans-serif;
       background-color: var(--bg-main);
       color: var(--text-main);
-      padding: 20px;
-      line-height: 1.5;
+      padding-bottom: 80px; /* Space for Bottom Nav */
     }
 
-    header {
-      max-width: 1000px;
-      margin: 0 auto 20px auto;
-      text-align: center;
-    }
-    header h1 { color: var(--primary); margin-bottom: 5px; font-size: 24px; }
-
-    /* -----------------------------------------------------------------
-       TABS NAVIGATION
-       ----------------------------------------------------------------- */
-    .tab-nav {
+    /* Top Header & Lang Switcher */
+    .top-bar {
       display: flex;
-      gap: 10px;
-      max-width: 1000px;
-      margin: 0 auto 20px auto;
-      border-bottom: 2px solid var(--border);
-      padding-bottom: 8px;
-    }
-    .tab-btn {
-      background: none;
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      color: var(--text-muted);
-      font-weight: 500;
-      border-radius: 6px;
-      transition: all 0.2s;
-      display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      background: white;
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .tab-btn:hover { background-color: rgba(79, 70, 229, 0.05); color: var(--primary); }
-    .tab-btn.active { background-color: var(--primary); color: white; }
+    .top-bar h1 { font-size: 18px; color: var(--primary); }
+    
+    .lang-switcher { display: flex; gap: 8px; }
+    .lang-btn {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .lang-btn.active {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
 
-    /* -----------------------------------------------------------------
-       COMPONENTS (CARDS, TABLES, FORMS)
-       ----------------------------------------------------------------- */
-    main { max-width: 1000px; margin: 0 auto; }
+    /* Container */
+    main { max-width: 800px; margin: 20px auto; padding: 0 15px; }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
+    /* Cards & Forms */
     .card {
       background: var(--bg-card);
-      border-radius: 12px;
-      padding: 24px;
+      border-radius: 16px;
+      padding: 20px;
       box-shadow: var(--shadow);
       margin-bottom: 20px;
       border: 1px solid var(--border);
     }
-    .card h3 { margin-bottom: 15px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+    .card h3 { margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
 
-    .att-form-grid {
+    .form-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 15px;
     }
-    label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 14px; }
-    select, input {
+    .form-group { display: flex; flex-direction: column; }
+    label { margin-bottom: 6px; font-weight: 500; font-size: 14px; color: #475569; }
+    select, input, textarea {
       width: 100%;
-      padding: 10px;
+      padding: 10px 12px;
       border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 15px;
+      border-radius: 8px;
+      font-size: 14px;
       background-color: #f8fafc;
+      font-family: inherit;
     }
-    select:focus, input:focus { outline: 2px solid var(--primary); background-color: #fff; }
+    select:focus, input:focus, textarea:focus { outline: 2px solid var(--primary); background-color: #fff; }
 
-    .btn-save {
+    .btn-submit {
       background-color: var(--primary);
       color: white;
       border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-size: 15px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
       cursor: pointer;
       font-weight: 500;
+      width: 100%;
+      margin-top: 15px;
     }
-    .btn-save:hover { background-color: var(--primary-hover); }
+    .btn-submit:hover { background-color: var(--primary-hover); }
 
-    /* Stats Grid */
-    .stats {
+    /* Profile Card (Modern UI) */
+    .employee-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 15px;
-      margin-bottom: 20px;
     }
-    .stat-box {
+    .profile-card {
       background: white;
+      border-radius: 12px;
       padding: 15px;
-      border-radius: 10px;
-      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
       display: flex;
       align-items: center;
-      gap: 12px;
-      border: 1px solid var(--border);
+      gap: 15px;
+      position: relative;
+      box-shadow: var(--shadow);
     }
-    .stat-dot { width: 12px; height: 12px; border-radius: 50%; }
-    .stat-dot.present { background-color: var(--c-present); }
-    .stat-dot.absent { background-color: var(--c-absent); }
-    .stat-dot.late { background-color: var(--c-late); }
-    .stat-count { font-size: 20px; font-weight: 700; }
-    .stat-label { font-size: 13px; color: var(--text-muted); }
-
-    /* Tables */
-    .table-responsive { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 15px; }
-    th, td { padding: 12px; border-bottom: 1px solid var(--border); }
-    th { background-color: #f8fafc; font-weight: 600; color: var(--text-main); }
-    tr:hover { background-color: #f8fafc; }
-
-    .badge {
-      display: inline-block;
-      padding: 4px 8px;
+    .profile-img-circle {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #e2e8f0;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+    .profile-info { flex: 1; }
+    .profile-info h4 { font-size: 15px; margin-bottom: 4px; }
+    .profile-info p { font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
+    
+    /* Attendance List UI */
+    .search-box { margin-bottom: 15px; }
+    .att-item {
+      background: white;
       border-radius: 12px;
+      padding: 15px;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+    .att-details h4 { font-size: 15px; margin-bottom: 4px; }
+    .att-details p { font-size: 12px; color: var(--text-muted); }
+    
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
       font-size: 12px;
       font-weight: 600;
-      text-transform: uppercase;
     }
-    .badge.Present { background-color: #ecfdf5; color: #065f46; }
-    .badge.Absent { background-color: #fef2f2; color: #991b1b; }
-    .badge.Late { background-color: #fffbeb; color: #92400e; }
+    .badge.Present { background-color: #d1fae5; color: #065f46; }
+    .badge.Absent { background-color: #fee2e2; color: #991b1b; }
+    .badge.Late { background-color: #fef3c7; color: #92400e; }
 
-    .muted { color: var(--text-muted); font-size: 14px; }
-    .btn-del {
-      background-color: #fee2e2;
-      color: #ef4444;
+    .btn-del-icon {
+      background: none;
       border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
+      color: #ef4444;
       cursor: pointer;
-      font-weight: bold;
+      font-size: 16px;
+      padding: 5px;
     }
-    .btn-del:hover { background-color: #fca5a5; }
 
-    /* Loading and Toast */
+    /* 📱 BOTTOM NAVIGATION BAR */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 65px;
+      background: white;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.03);
+    }
+    .nav-item {
+      background: none;
+      border: none;
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 11px;
+      font-family: inherit;
+    }
+    .nav-item span { font-size: 20px; }
+    .nav-item.active { color: var(--primary); font-weight: 600; }
+
+    /* Loading Bar */
     .loading-bar {
       position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 4px;
-      background-color: #e2e8f0;
-      display: none;
-      z-index: 9999;
+      top: 0; left: 0; right: 0; height: 3px;
+      background-color: #e2e8f0; display: none; z-index: 9999;
     }
     .loading-bar.active { display: block; }
     .loading-bar-inner {
-      height: 100%;
-      width: 30%;
-      background-color: var(--primary);
+      height: 100%; width: 30%; background-color: var(--primary);
       animation: loadingAnim 1s infinite linear;
     }
-    @keyframes loadingAnim {
-      0% { margin-left: -30%; }
-      100% { margin-left: 100%; }
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 20px; right: 20px;
-      background: #333; color: white;
-      padding: 12px 24px;
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      display: none;
-      z-index: 9999;
-    }
-    .toast.show { display: block; }
-    .toast.success { background-color: var(--c-present); }
-    .toast.error { background-color: var(--c-absent); }
+    @keyframes loadingAnim { 0% { margin-left: -30%; } 100% { margin-left: 100%; } }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>📅 ລະບົບຈັດການລາຍຊື່ ແລະ ເວລາມາວຽກ</h1>
-  </header>
-
-  <nav class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab(0)">
-      <span>📅</span> Attendance Tracking
-    </button>
-    <button class="tab-btn" onclick="switchTab(1)">
-      <span>👥</span> Employee Management
-    </button>
-  </nav>
+  <div class="top-bar">
+    <h1 id="ui-app-title">📅 ລະບົບຈັດການລາຍຊື່ ແລະ ເວລາມາວຽກ</h1>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="changeLang('lo')">🇱🇦 ລາວ</button>
+      <button class="lang-btn" onclick="changeLang('en')">🇬🇧 ENG</button>
+    </div>
+  </div>
 
   <div class="loading-bar" id="loadingBar"><div class="loading-bar-inner"></div></div>
 
   <main>
     <div class="tab-panel active" id="tab0">
       <div class="card">
-        <h3>📋 บันທຶກການມາວຽກ</h3>
+        <h3 id="ui-title-add-att">📋 ບັນທຶກການມາວຽກມື້ຕໍ່ມື້</h3>
         <form id="attendanceForm" onsubmit="event.preventDefault(); saveRecord();">
-          <div class="att-form-grid">
-            <div>
-              <label>ຊື່ພະນັກງານ:</label>
+          <div class="form-grid">
+            <div class="form-group">
+              <label id="ui-label-select-emp">ເລືອກພະນັກງານ:</label>
               <select id="empSelect" required>
                 <option value="">-- ເລືອກພະນັກງານ --</option>
               </select>
             </div>
-            <div>
-              <label>ສະຖານະ:</label>
+            <div class="form-group">
+              <label id="ui-label-date">ວັນທີ:</label>
+              <input type="date" id="dateInput" required>
+            </div>
+            <div class="form-group">
+              <label id="ui-label-status">ສະຖານະ:</label>
               <select id="statusSelect" required>
-                <option value="Present">Present</option>
-                <option value="Absent">Absent</option>
-                <option value="Late">Late</option>
+                <option value="Present" id="opt-present">Present (ມາ)</option>
+                <option value="Absent" id="opt-absent">Absent (າດ)</option>
+                <option value="Late" id="opt-late">Late (ສາຍ)</option>
               </select>
             </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label id="ui-label-remarks">ໝາຍເຫດ:</label>
+              <input type="text" id="remarksInput" placeholder="...">
+            </div>
           </div>
-          <div style="margin-top: 15px;">
-            <button class="btn-save" type="submit">+ Save Record</button>
-          </div>
+          <button class="btn-submit" type="submit" id="ui-btn-save-att">+ ບັນທຶກເວລາມາວຽກ</button>
         </form>
       </div>
 
-      <div class="stats">
-        <div class="stat-box">
-          <div class="stat-dot present"></div>
-          <div>
-            <div class="stat-count" id="countPresent">0</div>
-            <div class="stat-label">Present</div>
-          </div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-dot absent"></div>
-          <div>
-            <div class="stat-count" id="countAbsent">0</div>
-            <div class="stat-label">Absent</div>
-          </div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-dot late"></div>
-          <div>
-            <div class="stat-count" id="countLate">0</div>
-            <div class="stat-label">Late</div>
-          </div>
-        </div>
+      <div class="search-box">
+        <input type="text" id="searchInput" oninput="renderAttendance()" placeholder="🔍 ຄົ້ນຫາຊື່ພະນັກງານ...">
       </div>
-
-      <div class="card">
-        <h3>📊 ລາຍການມາວຽກທັງໝົດ</h3>
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>ລໍາດັບ</th>
-                <th>ຊື່ພະນັກງານ</th>
-                <th>ວັນທີ</th>
-                <th>ສະຖານະ</th>
-                <th>ເວລາ</th>
-                <th>ຈັດການ</th>
-              </tr>
-            </thead>
-            <tbody id="attendanceBody">
-              </tbody>
-          </table>
+      <div id="attendanceHistoryContainer">
         </div>
-      </div>
     </div>
 
     <div class="tab-panel" id="tab1">
       <div class="card">
-        <h3>➕ ເພີ່ມພະນັກງານໃໝ່</h3>
+        <h3 id="ui-title-add-emp">➕ ເພີ່ມພະນັກງານໃໝ່</h3>
         <form id="employeeForm" onsubmit="event.preventDefault(); saveEmployee();">
-          <div class="att-form-grid">
-            <div>
-              <label>ລະຫັດພະນັກງານ:</label>
-              <input type="text" id="empIdInput" required placeholder="ຕົວຢ່າງ: EMP01">
+          <div class="form-grid">
+            <div class="form-group">
+              <label id="ui-emp-id">ລະຫັດພະນັກງານ:</label>
+              <input type="text" id="empId" required placeholder="EMP01">
             </div>
-            <div>
-              <label>ຊື່ ແລະ ນາມສະກຸນ:</label>
-              <input type="text" id="empNameInput" required placeholder="ຊື່ພະນັກງານ">
+            <div class="form-group">
+              <label id="ui-emp-name">ຊື່ ແລະ ນາມສະກຸນ:</label>
+              <input type="text" id="empName" required placeholder="...">
             </div>
-            <div>
-              <label>ພະແນກ:</label>
-              <input type="text" id="empDeptInput" placeholder="ພະແນກ">
+            <div class="form-group">
+              <label id="ui-emp-phone">ເບີໂທ:</label>
+              <input type="text" id="empPhone" required placeholder="020...">
+            </div>
+            <div class="form-group">
+              <label id="ui-emp-village">ບ້ານ:</label>
+              <input type="text" id="empVillage" placeholder="...">
+            </div>
+            <div class="form-group">
+              <label id="ui-emp-district">ເມືອງ:</label>
+              <input type="text" id="empDistrict" placeholder="...">
+            </div>
+            <div class="form-group">
+              <label id="ui-emp-province">ແຂວງ:</label>
+              <input type="text" id="empProvince" placeholder="...">
+            </div>
+            <div class="form-group">
+              <label id="ui-emp-dept">ພະແນກ:</label>
+              <input type="text" id="empDept" placeholder="...">
+            </div>
+            <div class="form-group">
+              <label id="ui-emp-pos">ຕຳແໜ່ງ:</label>
+              <input type="text" id="empPos" placeholder="...">
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label id="ui-emp-img">ຮູບໂປຣໄຟລ໌:</label>
+              <input type="file" id="empImageFile" accept="image/*">
             </div>
           </div>
-          <div style="margin-top: 15px;">
-            <button class="btn-save" type="submit">+ Add Employee</button>
-          </div>
+          <button class="btn-submit" type="submit" id="ui-btn-save-emp">+ ເພີ່ມພະນັກງານ</button>
         </form>
       </div>
 
-      <div class="card">
-        <h3>👥 ລາຍຊື່ພະນັກງານທັງໝົດ</h3>
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>ລໍາດັບ</th>
-                <th>ລະຫັດພະນັກງານ</th>
-                <th>ຊື່ ແລະ ນາມສະກຸນ</th>
-                <th>ພະແນກ</th>
-                <th>ຈັດການ</th>
-              </tr>
-            </thead>
-            <tbody id="employeeBody">
-              </tbody>
-          </table>
+      <div class="employee-grid" id="employeeListContainer">
         </div>
-      </div>
     </div>
   </main>
 
-  <div class="toast" id="toast"></div>
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-tab0" onclick="switchTab(0)">
+      <span>📅</span><p id="ui-nav-att">ບັນທຶກວຽກ</p>
+    </button>
+    <button class="nav-item" id="nav-tab1" onclick="switchTab(1)">
+      <span>👥</span><p id="ui-nav-emp">ພະນັກງານ</p>
+    </button>
+  </nav>
 
   <script>
     // -----------------------------------------------------------------
-    // CONFIG & GLOBALS
+    // CONFIG & DICTIONARY (2 ພາສາ)
     // -----------------------------------------------------------------
-    // 🔗 ໃສ່ Link Web App URL ຂອງເຈົ້າໃຫ້ຮຽບຮ້ອຍແລ້ວ
-    const API = "https://script.google.com/macros/s/AKfycby3V9NfZ-5C04uNqJ6mBvK6z7fK8b_6m1B9-O6z_yLw/exec"; 
+    const API = "https://script.google.com/macros/s/AKfycbwkgZI1JqULFpxl5oGN1-hnVH_sLqL70pS_vma_0enW9W02Ubgg1W3OYGKtZiC5R27esw/exec";
     
+    const langData = {
+      lo: {
+        appTitle: "📅 ລະບົບຈັດການລາຍຊື່ ແລະ ເວລາມາວຽກ",
+        navAtt: "ບັນທຶກວຽກ", navEmp: "ພະນັກງານ",
+        titleAddAtt: "📋 ບັນທຶກການມາວຽກມື້ຕໍ່ມື້", labelSelectEmp: "ເລືອກພະນັກງານ:",
+        labelDate: "ວັນທີ:", labelStatus: "ສະຖານະ:", labelRemarks: "ໝາຍເຫດ:",
+        btnSaveAtt: "+ ບັນທຶກເວລາມາວຽກ", searchPlace: "🔍 ຄົ້ນຫາຊື່ພະນັກງານ...",
+        titleAddEmp: "➕ ເພີ່ມພະນັກງານໃໝ່", empId: "ລະຫັດພະນັກງານ:",
+        empName: "ຊື່ ແລະ ນາມສະກຸນ:", empPhone: "ເບີໂທ:", empVillage: "ບ້ານ:",
+        empDistrict: "ເມືອງ:", empProvince: "ແຂວງ:", empDept: "ພະແນກ:",
+        empPos: "ຕຳແໜ່ງ:", empImg: "ຮູບໂປຣໄຟລ໌:", btnSaveEmp: "+ ເພີ່ມພະນັກງານ",
+        optPresent: "ມາ (Present)", optAbsent: "ຂາດ (Absent)", optLate: "ສາຍ (Late)",
+        statusPresent: "ມາ", statusAbsent: "ຂາດ", statusLate: "ສາຍ",
+        confirmDel: "ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບ?", alertSuccess: "ດໍາເນີນການສໍາເລັດ!"
+      },
+      en: {
+        appTitle: "📅 Attendance & Employee Management",
+        navAtt: "Attendance", navEmp: "Employees",
+        titleAddAtt: "📋 Daily Attendance Tracking", labelSelectEmp: "Select Employee:",
+        labelDate: "Date:", labelStatus: "Status:", labelRemarks: "Remarks:",
+        btnSaveAtt: "+ Save Record", searchPlace: "🔍 Search employee name...",
+        titleAddEmp: "➕ Add New Employee", empId: "Employee ID:",
+        empName: "Full Name:", empPhone: "Phone Number:", empVillage: "Village:",
+        empDistrict: "District:", empProvince: "Province:", empDept: "Department:",
+        empPos: "Position:", empImg: "Profile Image:", btnSaveEmp: "+ Add Employee",
+        optPresent: "Present", optAbsent: "Absent", optLate: "Late",
+        statusPresent: "Present", statusAbsent: "Absent", statusLate: "Late",
+        confirmDel: "Are you sure you want to delete this?", alertSuccess: "Success!"
+      }
+    };
+
+    let currentLang = 'lo';
     let employees = [];
-    let records = [];
+    let attendance = [];
 
     // -----------------------------------------------------------------
-    // UTILITIES
+    // MULTI-LANGUAGE SYSTEM
     // -----------------------------------------------------------------
-    function esc(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    function changeLang(lang) {
+      currentLang = lang;
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('onclick').includes(lang));
+      });
+      updateUI();
+    }
+
+    function updateUI() {
+      const l = langData[currentLang];
+      document.getElementById('ui-app-title').textContent = l.appTitle;
+      document.getElementById('ui-nav-att').textContent = l.navAtt;
+      document.getElementById('ui-nav-emp').textContent = l.navEmp;
+      document.getElementById('ui-title-add-att').textContent = l.titleAddAtt;
+      document.getElementById('ui-label-select-emp').textContent = l.labelSelectEmp;
+      document.getElementById('ui-label-date').textContent = l.labelDate;
+      document.getElementById('ui-label-status').textContent = l.labelStatus;
+      document.getElementById('ui-label-remarks').textContent = l.labelRemarks;
+      document.getElementById('ui-btn-save-att').textContent = l.btnSaveAtt;
+      document.getElementById('searchInput').placeholder = l.searchPlace;
+      document.getElementById('ui-title-add-emp').textContent = l.titleAddEmp;
+      document.getElementById('ui-emp-id').textContent = l.empId;
+      document.getElementById('ui-emp-name').textContent = l.empName;
+      document.getElementById('ui-emp-phone').textContent = l.empPhone;
+      document.getElementById('ui-emp-village').textContent = l.empVillage;
+      document.getElementById('ui-emp-district').textContent = l.empDistrict;
+      document.getElementById('ui-emp-province').textContent = l.empProvince;
+      document.getElementById('ui-emp-dept').textContent = l.empDept;
+      document.getElementById('ui-emp-pos').textContent = l.empPos;
+      document.getElementById('ui-emp-img').textContent = l.empImg;
+      document.getElementById('ui-btn-save-emp').textContent = l.btnSaveEmp;
+      
+      document.getElementById('opt-present').textContent = l.optPresent;
+      document.getElementById('opt-absent').textContent = l.optAbsent;
+      document.getElementById('opt-late').textContent = l.optLate;
+
+      renderAttendance();
+      renderEmployees();
+    }
+
+    // -----------------------------------------------------------------
+    // CONTROLLERS
+    // -----------------------------------------------------------------
+    function switchTab(idx) {
+      document.querySelectorAll('.nav-item').forEach((b, i) => b.classList.toggle('active', i === idx));
+      document.querySelectorAll('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
     }
 
     function setLoading(show) {
-      const bar = document.getElementById('loadingBar');
-      if (bar) bar.classList.toggle('active', show);
+      document.getElementById('loadingBar').classList.toggle('active', show);
     }
 
-    function showToast(msg, type = 'success') {
-      const t = document.getElementById('toast');
-      if (!t) return;
-      t.textContent = msg;
-      t.className = `toast show ${type}`;
-      setTimeout(() => t.classList.remove('show'), 3000);
+    function esc(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     // -----------------------------------------------------------------
-    // TAB CONTROLLER
-    // -----------------------------------------------------------------
-    function switchTab(idx) {
-      const buttons = document.querySelectorAll('.tab-nav .tab-btn');
-      const panels = document.querySelectorAll('main .tab-panel');
-      
-      buttons.forEach((b, i) => b.classList.toggle('active', i === idx));
-      panels.forEach((p, i) => {
-        if (i === idx) {
-          p.style.display = 'block';
-          p.classList.add('active');
-        } else {
-          p.style.display = 'none';
-          p.classList.remove('active');
-        }
-      });
-    }
-
-    // -----------------------------------------------------------------
-    // CORE SYSTEM FUNCTIONS (API & DATA)
+    // DATA LAYER (API)
     // -----------------------------------------------------------------
     async function fetchData() {
       setLoading(true);
@@ -398,45 +442,91 @@
         const res = await fetch(API);
         const data = await res.json();
         employees = data.employees || [];
-        records = data.attendance || [];
+        attendance = data.attendance || [];
+        
+        document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
+        
+        loadEmpDropdown();
+        renderAttendance();
+        renderEmployees();
       } catch (err) {
         console.error(err);
-        showToast('ໂຫຼດຂໍ້ມູນບໍ່ສໍາເລັດ', 'error');
       } finally {
         setLoading(false);
-        loadEmpDropdown();
-        renderAll();
-        renderEmployees();
       }
     }
 
-    async function saveRecord() {
-      const empName = document.getElementById('empSelect').value;
-      const status = document.getElementById('statusSelect').value;
-      if (!empName) return;
+    function getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    async function saveEmployee() {
+      const id = document.getElementById('empId').value;
+      const name = document.getElementById('empName').value;
+      const phone = document.getElementById('empPhone').value;
+      const village = document.getElementById('empVillage').value;
+      const district = document.getElementById('empDistrict').value;
+      const province = document.getElementById('empProvince').value;
+      const department = document.getElementById('empDept').value;
+      const position = document.getElementById('empPos').value;
+      const imgFile = document.getElementById('empImageFile').files[0];
       
+      let base64Img = "";
+      if (imgFile) {
+        base64Img = await getBase64(imgFile);
+      }
+
       setLoading(true);
       try {
         await fetch(API, {
           method: 'POST',
           mode: 'no-cors',
-          body: JSON.stringify({ action: 'addAttendance', name: empName, status: status })
+          body: JSON.stringify({
+            action: 'addEmployee', id, name, phone, village, district, province, department, position, image: base64Img
+          })
         });
-        showToast('ບັນທຶກສໍາເລັດ');
+        alert(langData[currentLang].alertSuccess);
+        document.getElementById('employeeForm').reset();
         fetchData();
       } catch (err) {
-        showToast('ບັນທຶກບໍ່ສໍາເລັດ', 'error');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function saveRecord() {
+      const selectVal = document.getElementById('empSelect').value;
+      if (!selectVal) return;
+      const [id, name] = selectVal.split('|');
+      const date = document.getElementById('dateInput').value;
+      const status = document.getElementById('statusSelect').value;
+      const remarks = document.getElementById('remarksInput').value;
+
+      setLoading(true);
+      try {
+        await fetch(API, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: JSON.stringify({ action: 'addAttendance', id, name, date, status, remarks })
+        });
+        alert(langData[currentLang].alertSuccess);
+        document.getElementById('remarksInput').value = "";
+        fetchData();
+      } catch (err) {
+        console.error(err);
       } finally {
         setLoading(false);
       }
     }
 
     async function deleteAttendance(rowIndex) {
-      if (!rowIndex || rowIndex === 'undefined') {
-        alert('ບໍ່ສາມາດລຶບໄດ້: ບໍ່ພົບຕຳແໜ່ງແຖວຂໍ້ມູນ');
-        return;
-      }
-      if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບລາຍການມາວຽກນີ້?')) {
+      if (confirm(langData[currentLang].confirmDel)) {
         setLoading(true);
         try {
           await fetch(API, {
@@ -444,40 +534,15 @@
             mode: 'no-cors',
             body: JSON.stringify({ action: 'deleteAttendance', rowIndex: rowIndex })
           });
-          alert('ລຶບຂໍ້ມູນຮຽບຮ້ອຍແລ້ວ!');
           fetchData();
-        } catch (error) {
-          alert('ເກີດຂໍ້ຜິດພາດໃນການລຶບ');
-        } finally {
-          setLoading(false);
+        } catch (err) {
+          console.error(err);
         }
       }
     }
 
-    async function saveEmployee() {
-      const id = document.getElementById('empIdInput').value;
-      const name = document.getElementById('empNameInput').value;
-      const dept = document.getElementById('empDeptInput').value;
-      
-      setLoading(true);
-      try {
-        await fetch(API, {
-          method: 'POST',
-          mode: 'no-cors',
-          body: JSON.stringify({ action: 'addEmployee', id, name, dept })
-        });
-        showToast('ເພີ່ມພ量ນັກງານສໍາເລັດ');
-        document.getElementById('employeeForm').reset();
-        fetchData();
-      } catch (err) {
-        showToast('ເກີດຂໍ້ຜິດພາດ', 'error');
-      } finally {
-        setLoading(false);
-      }
-    }
-
     async function deleteEmployee(id) {
-      if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບພະນັກງານຜູ້ນີ້?')) {
+      if (confirm(langData[currentLang].confirmDel)) {
         setLoading(true);
         try {
           await fetch(API, {
@@ -485,84 +550,86 @@
             mode: 'no-cors',
             body: JSON.stringify({ action: 'deleteEmployee', id: id })
           });
-          showToast('ລຶບພະນັກງານສໍາເລັດ');
           fetchData();
         } catch (err) {
-          showToast('ເກີດຂໍ້ຜິດພາດ', 'error');
-        } finally {
-          setLoading(false);
+          console.error(err);
         }
       }
     }
 
     // -----------------------------------------------------------------
-    // RENDER INTERFACE LAYER
+    // RENDER UI LAYER
     // -----------------------------------------------------------------
     function loadEmpDropdown() {
       const select = document.getElementById('empSelect');
       if (!select) return;
       select.innerHTML = '<option value="">-- ເລືອກພະນັກງານ --</option>' + 
-        employees.map(e => `<option value="${esc(e.name)}">${esc(e.name)}</option>`).join('');
+        employees.map(e => `<option value="${esc(e.employeeid)}|${esc(e.fullname)}">${esc(e.fullname)} (${esc(e.employeeid)})</option>`).join('');
     }
 
-    function renderAll() {
-      const tbody = document.getElementById('attendanceBody');
-      if (!tbody) return;
+    function renderAttendance() {
+      const container = document.getElementById('attendanceHistoryContainer');
+      if (!container) return;
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const l = langData[currentLang];
 
-      let present = 0, absent = 0, late = 0;
+      const filtered = attendance.filter(r => (r.fullname || '').toLowerCase().includes(query));
 
-      if (!records || records.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">ບໍ່ມີຂໍ້ມູນການມາວຽກ</td></tr>`;
+      if (filtered.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:gray; padding:20px;">No data found</p>`;
         return;
       }
 
-      tbody.innerHTML = records.map((r, i) => {
-        if (r.status === 'Present') present++;
-        if (r.status === 'Absent') absent++;
-        if (r.status === 'Late') late++;
-
-        let displayDate = '';
-        if (r.date) {
-          const d = new Date(r.date);
-          displayDate = !isNaN(d.getTime()) ? d.toLocaleDateString('lo-LA') : r.date;
-        }
+      container.innerHTML = filtered.map(r => {
+        let displayStatus = r.status;
+        if (r.status === 'Present') displayStatus = l.statusPresent;
+        if (r.status === 'Absent') displayStatus = l.statusAbsent;
+        if (r.status === 'Late') displayStatus = l.statusLate;
 
         return `
-          <tr>
-            <td>${records.length - i}</td>
-            <td>${esc(r.name)}</td>
-            <td>${displayDate}</td>
-            <td><span class="badge ${esc(r.status)}">${esc(r.status)}</span></td>
-            <td class="muted">${esc(r.time || '')}</td>
-            <td><button class="btn-del" onclick="deleteAttendance('${r.rowIndex}')">X</button></td>
-          </tr>`;
+          <div class="att-item">
+            <div class="att-details">
+              <h4>${esc(r.fullname)} <span style="font-size:12px; color:gray;">(${esc(r.employeeid)})</span></h4>
+              <p>📅 ${esc(r.date)} | ⏰ ${esc(r.time || '')}</p>
+              ${r.remarks ? `<p style="font-style:italic; color:#4f46e5;">📝 ${esc(r.remarks)}</p>` : ''}
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="badge ${esc(r.status)}">${esc(displayStatus)}</span>
+              <button class="btn-del-icon" onclick="deleteAttendance('${r.rowIndex}')">🗑️</button>
+            </div>
+          </div>`;
       }).join('');
-
-      document.getElementById('countPresent').textContent = present;
-      document.getElementById('countAbsent').textContent = absent;
-      document.getElementById('countLate').textContent = late;
     }
 
     function renderEmployees() {
-      const tbody = document.getElementById('employeeBody');
-      if (!tbody) return;
-      
-      if (!employees || employees.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">ບໍ່ມີຂໍ້ມູນລາຍຊື່ພະນັກງານ</td></tr>`;
+      const container = document.getElementById('employeeListContainer');
+      if (!container) return;
+
+      if (employees.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:gray; padding:20px; grid-column:1/-1;">No employees</p>`;
         return;
       }
 
-      tbody.innerHTML = employees.map((emp, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${esc(emp.id)}</td>
-          <td>${esc(emp.name)}</td>
-          <td>${esc(emp.dept || '')}</td>
-          <td><button class="btn-del" onclick="deleteEmployee('${esc(emp.id)}')">X</button></td>
-        </tr>`).join('');
+      container.innerHTML = employees.map(emp => {
+        const fallbackImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24'><path fill='%23cbd5e1' d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z'/></svg>";
+        const profileSrc = emp.profileimage ? emp.profileimage : fallbackImg;
+
+        return `
+          <div class="profile-card">
+            <img class="profile-img-circle" src="${profileSrc}" alt="Profile">
+            <div class="profile-info">
+              <h4>${esc(emp.fullname)}</h4>
+              <p>🆔 ID: ${esc(emp.employeeid)}</p>
+              <p>📞 Phone: ${esc(emp.phonenumber)}</p>
+              <p>🏢 ${esc(emp.department || '-')} | 💼 ${esc(emp.position || '-')}</p>
+              <p>📍 ${esc(emp.village || '')}, ${esc(emp.district || '')}, ${esc(emp.province || '')}</p>
+            </div>
+            <button class="btn-del-icon" style="position:absolute; top:10px; right:10px;" onclick="deleteEmployee('${esc(emp.employeeid)}')">🗑️</button>
+          </div>`;
+      }).join('');
     }
 
-    // ONLOAD INITIALIZATION
+    // Initial Load
     window.onload = fetchData;
   </script>
 </body>
