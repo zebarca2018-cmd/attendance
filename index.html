@@ -1,1149 +1,569 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="lo">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Technical Department — Employee Attendance</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance & Employee Management</title>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* -----------------------------------------------------------------
+       BASE STYLES & THEME
+       ----------------------------------------------------------------- */
+    :root {
+      --bg-main: #f4f6f9;
+      --bg-card: #ffffff;
+      --text-main: #2d3748;
+      --text-muted: #718096;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      
+      --c-present: #10b981;
+      --c-absent: #ef4444;
+      --c-late: #f59e0b;
+    }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #0f1117;
-      color: #e2e8f0;
-      min-height: 100vh;
+      font-family: 'Noto Sans Lao', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      padding: 20px;
+      line-height: 1.5;
     }
 
-    /* ── Header ── */
     header {
-      background: linear-gradient(135deg, #1a1f2e 0%, #0d1b2a 100%);
-      border-bottom: 1px solid #1e3a5f;
-      padding: 20px 40px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      max-width: 1000px;
+      margin: 0 auto 20px auto;
+      text-align: center;
     }
-    .header-icon {
-      width: 44px; height: 44px;
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-    header h1 { font-size: 1.4rem; font-weight: 600; color: #f1f5f9; }
-    header p  { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+    header h1 { color: var(--primary); margin-bottom: 5px; font-size: 24px; }
 
-    /* ── Tab Navigation ── */
+    /* -----------------------------------------------------------------
+       TABS NAVIGATION
+       ----------------------------------------------------------------- */
     .tab-nav {
-      background: #1a1f2e;
-      border-bottom: 1px solid #1e293b;
       display: flex;
-      padding: 0 32px;
-      gap: 2px;
+      gap: 10px;
+      max-width: 1000px;
+      margin: 0 auto 20px auto;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 8px;
     }
     .tab-btn {
       background: none;
       border: none;
-      border-bottom: 2px solid transparent;
-      color: #64748b;
+      padding: 10px 20px;
+      font-size: 16px;
       cursor: pointer;
+      color: var(--text-muted);
+      font-weight: 500;
+      border-radius: 6px;
+      transition: all 0.2s;
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      padding: 14px 18px 12px;
-      transition: color 0.2s, border-color 0.2s;
-      white-space: nowrap;
     }
-    .tab-btn:hover { color: #94a3b8; }
-    .tab-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; }
-    .tab-chip {
-      width: 22px; height: 22px;
-      background: #1e293b;
-      border-radius: 6px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      line-height: 1;
-    }
-    .tab-btn.active .tab-chip { background: rgba(59,130,246,0.18); }
+    .tab-btn:hover { background-color: rgba(79, 70, 229, 0.05); color: var(--primary); }
+    .tab-btn.active { background-color: var(--primary); color: white; }
 
-    /* ── Tab Panels ── */
+    /* -----------------------------------------------------------------
+       COMPONENTS (CARDS, TABLES, FORMS)
+       ----------------------------------------------------------------- */
+    main { max-width: 1000px; margin: 0 auto; }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    /* ── Main layout ── */
-    main {
-      max-width: 1000px;
-      margin: 40px auto;
-      padding: 0 24px;
-    }
-
-    /* ── Card ── */
     .card {
-      background: #1a1f2e;
-      border: 1px solid #1e293b;
-      border-radius: 14px;
-      padding: 28px 32px;
-      margin-bottom: 28px;
-    }
-    .card-title {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #3b82f6;
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: var(--shadow);
       margin-bottom: 20px;
+      border: 1px solid var(--border);
     }
+    .card h3 { margin-bottom: 15px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
 
-    /* ── Form shared ── */
-    label {
-      display: block;
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: #94a3b8;
-      margin-bottom: 6px;
-      letter-spacing: 0.02em;
-    }
-    input[type="text"],
-    input[type="tel"],
-    input[type="date"],
-    select {
-      width: 100%;
-      background: #0f1117;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      color: #e2e8f0;
-      font-size: 0.9rem;
-      padding: 10px 14px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      appearance: none;
-    }
-    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.6); cursor: pointer; }
-    input:focus, select:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-    }
-    input::placeholder { color: #334155; }
-    .select-wrap { position: relative; }
-    .select-wrap::after {
-      content: '▾';
-      position: absolute;
-      right: 12px; top: 50%;
-      transform: translateY(-50%);
-      color: #64748b;
-      pointer-events: none;
-      font-size: 12px;
-    }
-    select option { background: #1a1f2e; }
-
-    /* ── Attendance entry form ── */
     .att-form-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr auto;
-      gap: 16px;
-      align-items: end;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
     }
-    @media (max-width: 720px) { .att-form-grid { grid-template-columns: 1fr; } }
-
-    /* ── Buttons ── */
-    .btn-save {
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-      color: #fff;
-      font-size: 0.9rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 24px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: opacity 0.2s, transform 0.1s;
-      display: flex; align-items: center; gap: 8px;
-      height: 42px;
-    }
-    .btn-save:hover { opacity: 0.9; }
-    .btn-save:active { transform: scale(0.97); }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-      color: #fff;
-      font-size: 0.875rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      padding: 11px 26px;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      display: inline-flex; align-items: center; gap: 8px;
-    }
-    .btn-primary:hover { opacity: 0.9; }
-    .btn-primary:active { transform: scale(0.97); }
-
-    .btn-ghost {
-      background: none;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      color: #64748b;
-      cursor: pointer;
-      font-size: 0.875rem;
-      font-weight: 500;
-      padding: 10px 20px;
-      transition: border-color 0.2s, color 0.2s;
-    }
-    .btn-ghost:hover { border-color: #3b82f6; color: #3b82f6; }
-
-    .btn-del {
-      background: none;
-      border: 1px solid #1e293b;
+    label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 14px; }
+    select, input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
       border-radius: 6px;
-      color: #64748b;
-      cursor: pointer;
-      font-size: 13px;
-      padding: 4px 8px;
-      transition: border-color 0.15s, color 0.15s;
+      font-size: 15px;
+      background-color: #f8fafc;
     }
-    .btn-del:hover { border-color: #ef4444; color: #ef4444; }
+    select:focus, input:focus { outline: 2px solid var(--primary); background-color: #fff; }
 
-    /* ── Stats ── */
+    .btn-save {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .btn-save:hover { background-color: var(--primary-hover); }
+
+    /* Stats Grid */
     .stats {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-    .stat-box {
-      background: #1a1f2e;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 18px 22px;
-      display: flex; align-items: center; gap: 14px;
-    }
-    .stat-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-    .stat-dot.present { background: #22c55e; box-shadow: 0 0 8px #22c55e88; }
-    .stat-dot.absent  { background: #ef4444; box-shadow: 0 0 8px #ef444488; }
-    .stat-dot.late    { background: #f59e0b; box-shadow: 0 0 8px #f59e0b88; }
-    .stat-count { font-size: 1.6rem; font-weight: 700; color: #f1f5f9; line-height: 1; }
-    .stat-label { font-size: 0.75rem; color: #64748b; margin-top: 3px; }
-
-    /* ── Table shared ── */
-    .tbl-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .tbl-header h2 {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #3b82f6;
-    }
-    .pill {
-      font-size: 0.78rem;
-      color: #64748b;
-      background: #0f1117;
-      border: 1px solid #1e293b;
-      border-radius: 20px;
-      padding: 3px 12px;
-    }
-    .tbl-wrap {
-      overflow-x: auto;
-      border-radius: 10px;
-      border: 1px solid #1e293b;
-    }
-    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-    thead th {
-      background: #0f1117;
-      color: #64748b;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 13px 18px;
-      text-align: left;
-      border-bottom: 1px solid #1e293b;
-    }
-    tbody tr { border-bottom: 1px solid #1e293b; transition: background 0.15s; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #0f1117; }
-    tbody td { padding: 13px 18px; color: #cbd5e1; vertical-align: middle; }
-    td.name { font-weight: 500; color: #f1f5f9; }
-    td.muted { color: #64748b; font-size: 0.8rem; }
-
-    /* ── Status badge ── */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      padding: 3px 10px;
-      border-radius: 20px;
-    }
-    .badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; }
-    .badge.Present { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
-    .badge.Present::before { background: #22c55e; }
-    .badge.Absent  { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
-    .badge.Absent::before  { background: #ef4444; }
-    .badge.Late    { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); }
-    .badge.Late::before    { background: #f59e0b; }
-
-    /* ── Monthly Summary selectors ── */
-    .summary-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      flex-wrap: wrap;
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
       margin-bottom: 20px;
     }
-    .summary-selectors { display: flex; gap: 12px; align-items: flex-end; }
-    .summary-selectors > div { min-width: 140px; }
-
-    .num-present { color: #22c55e; font-weight: 600; }
-    .num-absent  { color: #ef4444; font-weight: 600; }
-    .num-late    { color: #f59e0b; font-weight: 600; }
-    .num-total   { color: #94a3b8; font-weight: 500; }
-
-    .att-bar {
-      display: flex;
-      height: 6px;
-      border-radius: 4px;
-      overflow: hidden;
-      background: #0f1117;
-      min-width: 80px;
-      gap: 1px;
-    }
-    .att-bar span { height: 100%; border-radius: 2px; }
-    .att-bar .bar-p { background: #22c55e; }
-    .att-bar .bar-a { background: #ef4444; }
-    .att-bar .bar-l { background: #f59e0b; }
-
-    /* ── Employee form ── */
-    .emp-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    .emp-grid .span2 { grid-column: 1 / -1; }
-
-    .addr-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-      margin-top: 10px;
-    }
-    .addr-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      color: #475569;
-      margin-bottom: 2px;
-    }
-
-    /* Profile picture upload */
-    .upload-box {
-      position: relative;
-      background: #0f1117;
-      border: 1.5px dashed #1e293b;
+    .stat-box {
+      background: white;
+      padding: 15px;
       border-radius: 10px;
-      cursor: pointer;
-      min-height: 104px;
+      box-shadow: var(--shadow);
       display: flex;
       align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      transition: border-color 0.2s;
-    }
-    .upload-box:hover { border-color: #3b82f6; }
-    .upload-box input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-      font-size: 0;
-    }
-    .upload-ph {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      pointer-events: none;
-    }
-    .upload-ph-icon { font-size: 1.7rem; color: #334155; }
-    .upload-ph-hint { font-size: 0.72rem; color: #475569; }
-    .upload-preview {
-      display: none;
-      pointer-events: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-    }
-    .upload-preview img {
-      width: 62px; height: 62px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #3b82f6;
-    }
-    .upload-preview span {
-      font-size: 0.7rem;
-      color: #3b82f6;
-    }
-
-    .emp-form-actions {
-      margin-top: 24px;
-      display: flex;
       gap: 12px;
-      align-items: center;
+      border: 1px solid var(--border);
     }
+    .stat-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .stat-dot.present { background-color: var(--c-present); }
+    .stat-dot.absent { background-color: var(--c-absent); }
+    .stat-dot.late { background-color: var(--c-late); }
+    .stat-count { font-size: 20px; font-weight: 700; }
+    .stat-label { font-size: 13px; color: var(--text-muted); }
 
-    /* Employee table */
-    .emp-avatar {
-      width: 34px; height: 34px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #1e3a5f;
-      flex-shrink: 0;
-    }
-    .emp-avatar-ph {
-      width: 34px; height: 34px;
-      border-radius: 50%;
-      background: #1e293b;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px;
-      flex-shrink: 0;
-    }
-    td.avatar-col { width: 44px; padding-right: 4px; }
+    /* Tables */
+    .table-responsive { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 15px; }
+    th, td { padding: 12px; border-bottom: 1px solid var(--border); }
+    th { background-color: #f8fafc; font-weight: 600; color: var(--text-main); }
+    tr:hover { background-color: #f8fafc; }
 
-    .plate-tag {
+    .badge {
       display: inline-block;
-      font-size: 0.72rem;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
       font-weight: 600;
-      font-family: 'Courier New', monospace;
-      background: #0f1117;
-      border: 1px solid #1e293b;
+      text-transform: uppercase;
+    }
+    .badge.Present { background-color: #ecfdf5; color: #065f46; }
+    .badge.Absent { background-color: #fef2f2; color: #991b1b; }
+    .badge.Late { background-color: #fffbeb; color: #92400e; }
+
+    .muted { color: var(--text-muted); font-size: 14px; }
+    .btn-del {
+      background-color: #fee2e2;
+      color: #ef4444;
+      border: none;
+      padding: 6px 12px;
       border-radius: 4px;
-      padding: 2px 8px;
-      color: #94a3b8;
-      letter-spacing: 0.06em;
+      cursor: pointer;
+      font-weight: bold;
     }
+    .btn-del:hover { background-color: #fca5a5; }
 
-    @media (max-width: 680px) {
-      .emp-grid { grid-template-columns: 1fr; }
-      .emp-grid .span2 { grid-column: 1; }
-      .addr-grid { grid-template-columns: 1fr; }
-    }
-
-    /* ── Loading bar ── */
+    /* Loading and Toast */
     .loading-bar {
-      height: 3px;
-      background: #1e293b;
-      overflow: hidden;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background-color: #e2e8f0;
       display: none;
+      z-index: 9999;
     }
     .loading-bar.active { display: block; }
     .loading-bar-inner {
       height: 100%;
-      width: 38%;
-      background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
-      background-size: 200% 100%;
-      border-radius: 2px;
-      animation: loadSlide 1.3s ease-in-out infinite;
+      width: 30%;
+      background-color: var(--primary);
+      animation: loadingAnim 1s infinite linear;
     }
-    @keyframes loadSlide {
-      0%   { transform: translateX(-160%); }
-      100% { transform: translateX(420%); }
+    @keyframes loadingAnim {
+      0% { margin-left: -30%; }
+      100% { margin-left: 100%; }
     }
 
-    /* ── Sync indicator ── */
-    .sync-status {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      flex-shrink: 0;
-    }
-    .sync-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #334155;
-      transition: background 0.3s, box-shadow 0.3s;
-      flex-shrink: 0;
-    }
-    .sync-dot.ok     { background: #22c55e; box-shadow: 0 0 6px #22c55e88; }
-    .sync-dot.busy   { background: #f59e0b; box-shadow: 0 0 6px #f59e0b88; animation: pulse 1s ease-in-out infinite; }
-    .sync-dot.err    { background: #ef4444; box-shadow: 0 0 6px #ef444488; }
-    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
-    .sync-text { font-size: 0.73rem; color: #475569; white-space: nowrap; }
-
-    /* Disabled button state during loading */
-    button:disabled { opacity: 0.55 !important; cursor: not-allowed !important; transform: none !important; }
-
-    /* ── Empty state ── */
-    .empty {
-      text-align: center;
-      padding: 48px 24px;
-      color: #334155;
-    }
-    .empty-icon { font-size: 2.5rem; margin-bottom: 10px; }
-    .empty p { font-size: 0.9rem; }
-
-    /* ── Toast ── */
     .toast {
       position: fixed;
-      bottom: 28px; right: 28px;
-      background: #1a1f2e;
-      border: 1px solid #22c55e44;
-      color: #22c55e;
-      font-size: 0.85rem;
-      font-weight: 500;
-      padding: 12px 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.45);
-      opacity: 0;
-      transform: translateY(10px);
-      transition: opacity 0.25s, transform 0.25s;
-      pointer-events: none;
-      z-index: 999;
+      bottom: 20px; right: 20px;
+      background: #333; color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      display: none;
+      z-index: 9999;
     }
-    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.show { display: block; }
+    .toast.success { background-color: var(--c-present); }
+    .toast.error { background-color: var(--c-absent); }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="header-icon">🖥️</div>
-  <div>
-    <h1>Technical Department</h1>
-    <p>Employee Attendance Management System</p>
-  </div>
-  <div class="sync-status">
-    <div class="sync-dot" id="syncDot"></div>
-    <span class="sync-text" id="syncText">Connecting…</span>
-  </div>
-</header>
+  <header>
+    <h1>📅 ລະບົບຈັດການລາຍຊື່ ແລະ ເວລາມາວຽກ</h1>
+  </header>
 
-<nav class="tab-nav">
-  <button class="tab-btn active" onclick="switchTab(0)">
-    <span class="tab-chip">📅</span> Attendance Tracking
-  </button>
-  <button class="tab-btn" onclick="switchTab(1)">
-    <span class="tab-chip">👥</span> Employee Management
-  </button>
-</nav>
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab(0)">
+      <span>📅</span> Attendance Tracking
+    </button>
+    <button class="tab-btn" onclick="switchTab(1)">
+      <span>👥</span> Employee Management
+    </button>
+  </nav>
 
-<div class="loading-bar" id="loadingBar"><div class="loading-bar-inner"></div></div>
+  <div class="loading-bar" id="loadingBar"><div class="loading-bar-inner"></div></div>
 
-<main>
-
-  <!-- ═══════════════════════════
-       TAB 0 — Attendance Tracking
-  ════════════════════════════ -->
-  <div class="tab-panel active" id="tab0">
-
-    <!-- Entry Form -->
-    <div class="card">
-      <div class="card-title">New Attendance Entry</div>
-      <div class="att-form-grid">
-        <div>
-          <label for="empSelect">Employee</label>
-          <div class="select-wrap">
-            <select id="empSelect">
-              <option value="">— Select Employee —</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <label for="attDate">Date</label>
-          <input type="date" id="attDate" />
-        </div>
-        <div>
-          <label for="attStatus">Status</label>
-          <div class="select-wrap">
-            <select id="attStatus">
-              <option value="Present">Present</option>
-              <option value="Absent">Absent</option>
-              <option value="Late">Late</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <button class="btn-save" onclick="saveRecord()">＋ Save Record</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Overall Stats -->
-    <div class="stats">
-      <div class="stat-box">
-        <div class="stat-dot present"></div>
-        <div>
-          <div class="stat-count" id="countPresent">0</div>
-          <div class="stat-label">Present</div>
-        </div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-dot absent"></div>
-        <div>
-          <div class="stat-count" id="countAbsent">0</div>
-          <div class="stat-label">Absent</div>
-        </div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-dot late"></div>
-        <div>
-          <div class="stat-count" id="countLate">0</div>
-          <div class="stat-label">Late</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Attendance Records Table -->
-    <div class="card">
-      <div class="tbl-header">
-        <h2>Attendance Records</h2>
-        <span class="pill" id="totalCount">0 records</span>
-      </div>
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Employee Name</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Logged At</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="attBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Monthly Summary -->
-    <div class="card">
-      <div class="summary-bar">
-        <div class="card-title" style="margin-bottom:0">Monthly Summary</div>
-        <div class="summary-selectors">
-          <div>
-            <label for="sumMonth">Month</label>
-            <div class="select-wrap">
-              <select id="sumMonth" onchange="renderSummary()">
-                <option value="0">January</option><option value="1">February</option>
-                <option value="2">March</option><option value="3">April</option>
-                <option value="4">May</option><option value="5">June</option>
-                <option value="6">July</option><option value="7">August</option>
-                <option value="8">September</option><option value="9">October</option>
-                <option value="10">November</option><option value="11">December</option>
+  <main>
+    <div class="tab-panel active" id="tab0">
+      <div class="card">
+        <h3>📋 บันທຶກການມາວຽກ</h3>
+        <form id="attendanceForm" onsubmit="event.preventDefault(); saveRecord();">
+          <div class="att-form-grid">
+            <div>
+              <label>ຊື່ພະນັກງານ:</label>
+              <select id="empSelect" required>
+                <option value="">-- ເລືອກພະນັກງານ --</option>
+              </select>
+            </div>
+            <div>
+              <label>ສະຖານະ:</label>
+              <select id="statusSelect" required>
+                <option value="Present">Present</option>
+                <option value="Absent">Absent</option>
+                <option value="Late">Late</option>
               </select>
             </div>
           </div>
+          <div style="margin-top: 15px;">
+            <button class="btn-save" type="submit">+ Save Record</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="stats">
+        <div class="stat-box">
+          <div class="stat-dot present"></div>
           <div>
-            <label for="sumYear">Year</label>
-            <div class="select-wrap">
-              <select id="sumYear" onchange="renderSummary()"></select>
-            </div>
+            <div class="stat-count" id="countPresent">0</div>
+            <div class="stat-label">Present</div>
+          </div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-dot absent"></div>
+          <div>
+            <div class="stat-count" id="countAbsent">0</div>
+            <div class="stat-label">Absent</div>
+          </div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-dot late"></div>
+          <div>
+            <div class="stat-count" id="countLate">0</div>
+            <div class="stat-label">Late</div>
           </div>
         </div>
       </div>
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Employee Name</th>
-              <th>Present</th>
-              <th>Absent</th>
-              <th>Late</th>
-              <th>Total Days</th>
-              <th>Attendance</th>
-            </tr>
-          </thead>
-          <tbody id="summaryBody"></tbody>
-        </table>
+
+      <div class="card">
+        <h3>📊 ລາຍການມາວຽກທັງໝົດ</h3>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>ລໍາດັບ</th>
+                <th>ຊື່ພະນັກງານ</th>
+                <th>ວັນທີ</th>
+                <th>ສະຖານະ</th>
+                <th>ເວລາ</th>
+                <th>ຈັດການ</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceBody">
+              </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-  </div><!-- /tab0 -->
-
-
-  <!-- ═══════════════════════════════
-       TAB 1 — Employee Management
-  ════════════════════════════════ -->
-  <div class="tab-panel" id="tab1">
-
-    <!-- Registration Form -->
-    <div class="card">
-      <div class="card-title">Register New Employee</div>
-      <div class="emp-grid">
-
-        <div>
-          <label for="empFullName">Full Name <span style="color:#ef4444">*</span></label>
-          <input type="text" id="empFullName" placeholder="e.g. Alice Johnson" />
-        </div>
-
-        <div>
-          <label for="empPhone">Phone Number</label>
-          <input type="tel" id="empPhone" placeholder="e.g. 020 555 1234" />
-        </div>
-
-        <div>
-          <label for="empPlate">Vehicle License Plate</label>
-          <input type="text" id="empPlate" placeholder="e.g. 1A-1234" />
-        </div>
-
-        <div>
-          <label>Profile Picture</label>
-          <div class="upload-box" id="uploadBox">
-            <input type="file" id="photoInput" accept="image/*" />
-            <div class="upload-ph" id="uploadPh">
-              <div class="upload-ph-icon">📷</div>
-              <div class="upload-ph-hint">Click to upload a photo</div>
+    <div class="tab-panel" id="tab1">
+      <div class="card">
+        <h3>➕ ເພີ່ມພະນັກງານໃໝ່</h3>
+        <form id="employeeForm" onsubmit="event.preventDefault(); saveEmployee();">
+          <div class="att-form-grid">
+            <div>
+              <label>ລະຫັດພະນັກງານ:</label>
+              <input type="text" id="empIdInput" required placeholder="ຕົວຢ່າງ: EMP01">
             </div>
-            <div class="upload-preview" id="uploadPreview">
-              <img id="previewImg" src="" alt="Preview" />
-              <span>Photo selected ✓</span>
+            <div>
+              <label>ຊື່ ແລະ ນາມສະກຸນ:</label>
+              <input type="text" id="empNameInput" required placeholder="ຊື່ພະນັກງານ">
+            </div>
+            <div>
+              <label>ພະແນກ:</label>
+              <input type="text" id="empDeptInput" placeholder="ພະແນກ">
             </div>
           </div>
-        </div>
-
-        <div class="span2">
-          <div class="addr-label">Current Address</div>
-          <div class="addr-grid">
-            <div>
-              <label for="empVillage">Village / Town</label>
-              <input type="text" id="empVillage" placeholder="Village" />
-            </div>
-            <div>
-              <label for="empDistrict">District</label>
-              <input type="text" id="empDistrict" placeholder="District" />
-            </div>
-            <div>
-              <label for="empProvince">Province</label>
-              <input type="text" id="empProvince" placeholder="Province" />
-            </div>
+          <div style="margin-top: 15px;">
+            <button class="btn-save" type="submit">+ Add Employee</button>
           </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>👥 ລາຍຊື່ພະນັກງານທັງໝົດ</h3>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>ລໍາດັບ</th>
+                <th>ລະຫັດພະນັກງານ</th>
+                <th>ຊື່ ແລະ ນາມສະກຸນ</th>
+                <th>ພະແນກ</th>
+                <th>ຈັດການ</th>
+              </tr>
+            </thead>
+            <tbody id="employeeBody">
+              </tbody>
+          </table>
         </div>
-
-      </div>
-      <div class="emp-form-actions">
-        <button class="btn-primary" onclick="saveEmployee()">＋ Register Employee</button>
-        <button class="btn-ghost" onclick="clearEmpForm()">Clear Form</button>
       </div>
     </div>
+  </main>
 
-    <!-- Employee List -->
-    <div class="card">
-      <div class="tbl-header">
-        <h2>Registered Employees</h2>
-        <span class="pill" id="empCount">0 employees</span>
-      </div>
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th></th>
-              <th>Full Name</th>
-              <th>Phone</th>
-              <th>Address</th>
-              <th>Plate</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="empBody"></tbody>
-        </table>
-      </div>
-    </div>
+  <div class="toast" id="toast"></div>
 
-  </div><!-- /tab1 -->
+  <script>
+    // -----------------------------------------------------------------
+    // CONFIG & GLOBALS
+    // -----------------------------------------------------------------
+    // 🔗 ໃສ່ Link Web App URL ຂອງເຈົ້າໃຫ້ຮຽບຮ້ອຍແລ້ວ
+    const API = "https://script.google.com/macros/s/AKfycby3V9NfZ-5C04uNqJ6mBvK6z7fK8b_6m1B9-O6z_yLw/exec"; 
+    
+    let employees = [];
+    let records = [];
 
-</main>
-
-<div class="toast" id="toast"></div>
-
-<script>
-  /* ─── API ─── */
-  const API = 'https://script.google.com/macros/s/AKfycbzqle-PQhOZDKXpu_WuhVe8zp_znBjQgjlaxskUyYVRWfxjz6e2VVCIKbvNUodTXQloCQ/exec';
-
-  /* ─── State ─── */
-  let records   = [];
-  let employees = [];
-  let pendingPhoto = '';
-  let _busy = false;
-
-  /* ─── Boot ─── */
-  document.getElementById('attDate').value  = new Date().toISOString().split('T')[0];
-  document.getElementById('sumMonth').value = new Date().getMonth();
-  document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
-
-  fetchData();
-
-  /* ─── Tab switching ─── */
-  function switchTab(idx) {
-    document.querySelectorAll('.tab-btn').forEach((b, i)  => b.classList.toggle('active', i === idx));
-    document.querySelectorAll('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
-  }
-
-  /* ════════════════════════════════════════
-     API LAYER
-  ════════════════════════════════════════ */
-
-  async function fetchData() {
-    setLoading(true, 'Syncing…');
-    try {
-      const res  = await fetch(API);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-
-      employees = Array.isArray(data.employees) ? data.employees : [];
-      records   = Array.isArray(data.attendance) ? data.attendance : [];
-
-      setSyncStatus('ok');
-    } catch (err) {
-      console.error('fetchData:', err);
-      setSyncStatus('err', 'Sync failed');
-      showToast('Could not reach the server. Check your connection.', 'error');
-    } finally {
-      setLoading(false);
-      populateYears();
-      loadEmpDropdown();
-      renderAll();
-      renderEmployees();
+    // -----------------------------------------------------------------
+    // UTILITIES
+    // -----------------------------------------------------------------
+    function esc(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
-  }
 
-  /* POST with Content-Type: text/plain to avoid CORS preflight.
-     Google Apps Script receives the body in e.postData.contents and
-     can parse it with JSON.parse(e.postData.contents).
-     Falls back to no-cors (fire-and-forget) if the server is unreachable. */
-  async function postData(payload) {
-    setLoading(true, 'Saving…');
-    try {
-      const res = await fetch(API, {
-        method:  'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body:    JSON.stringify(payload)
+    function setLoading(show) {
+      const bar = document.getElementById('loadingBar');
+      if (bar) bar.classList.toggle('active', show);
+    }
+
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.className = `toast show ${type}`;
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // -----------------------------------------------------------------
+    // TAB CONTROLLER
+    // -----------------------------------------------------------------
+    function switchTab(idx) {
+      const buttons = document.querySelectorAll('.tab-nav .tab-btn');
+      const panels = document.querySelectorAll('main .tab-panel');
+      
+      buttons.forEach((b, i) => b.classList.toggle('active', i === idx));
+      panels.forEach((p, i) => {
+        if (i === idx) {
+          p.style.display = 'block';
+          p.classList.add('active');
+        } else {
+          p.style.display = 'none';
+          p.classList.remove('active');
+        }
       });
+    }
 
-      let result = {};
-      try { result = await res.json(); } catch (_) { /* non-JSON response is OK */ }
-
-      if (result.error) {
-        showToast(result.error, 'error');
+    // -----------------------------------------------------------------
+    // CORE SYSTEM FUNCTIONS (API & DATA)
+    // -----------------------------------------------------------------
+    async function fetchData() {
+      setLoading(true);
+      try {
+        const res = await fetch(API);
+        const data = await res.json();
+        employees = data.employees || [];
+        records = data.attendance || [];
+      } catch (err) {
+        console.error(err);
+        showToast('ໂຫຼດຂໍ້ມູນບໍ່ສໍາເລັດ', 'error');
+      } finally {
         setLoading(false);
-        return false;
+        loadEmpDropdown();
+        renderAll();
+        renderEmployees();
       }
+    }
 
-      await fetchData();   // refresh all data from server
-      return true;
-
-    } catch (netErr) {
-      /* CORS or network error — fall back to no-cors (opaque) send */
-      console.warn('CORS POST failed, retrying no-cors:', netErr.message);
+    async function saveRecord() {
+      const empName = document.getElementById('empSelect').value;
+      const status = document.getElementById('statusSelect').value;
+      if (!empName) return;
+      
+      setLoading(true);
       try {
         await fetch(API, {
           method: 'POST',
-          mode:   'no-cors',
-          body:   JSON.stringify(payload)
+          mode: 'no-cors',
+          body: JSON.stringify({ action: 'addAttendance', name: empName, status: status })
         });
-        /* Give the script a moment to write to the sheet before we re-fetch */
-        await new Promise(r => setTimeout(r, 1400));
-        await fetchData();
-        return true;
-      } catch (err2) {
-        console.error('postData no-cors fallback:', err2);
-        showToast('Network error — please try again.', 'error');
+        showToast('ບັນທຶກສໍາເລັດ');
+        fetchData();
+      } catch (err) {
+        showToast('ບັນທຶກບໍ່ສໍາເລັດ', 'error');
+      } finally {
         setLoading(false);
-        return false;
       }
     }
-  }
 
-  /* ════════════════════════════════════════
-     ATTENDANCE
-  ════════════════════════════════════════ */
+    async function deleteAttendance(rowIndex) {
+      if (!rowIndex || rowIndex === 'undefined') {
+        alert('ບໍ່ສາມາດລຶບໄດ້: ບໍ່ພົບຕຳແໜ່ງແຖວຂໍ້ມູນ');
+        return;
+      }
+      if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບລາຍການມາວຽກນີ້?')) {
+        setLoading(true);
+        try {
+          await fetch(API, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({ action: 'deleteAttendance', rowIndex: rowIndex })
+          });
+          alert('ລຶບຂໍ້ມູນຮຽບຮ້ອຍແລ້ວ!');
+          fetchData();
+        } catch (error) {
+          alert('ເກີດຂໍ້ຜິດພາດໃນການລຶບ');
+        } finally {
+          setLoading(false);
+        }
+      }
+    }
 
-  async function saveRecord() {
-    const name   = document.getElementById('empSelect').value.trim();
-    const date   = document.getElementById('attDate').value;
-    const status = document.getElementById('attStatus').value;
+    async function saveEmployee() {
+      const id = document.getElementById('empIdInput').value;
+      const name = document.getElementById('empNameInput').value;
+      const dept = document.getElementById('empDeptInput').value;
+      
+      setLoading(true);
+      try {
+        await fetch(API, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: JSON.stringify({ action: 'addEmployee', id, name, dept })
+        });
+        showToast('ເພີ່ມພ量ນັກງານສໍາເລັດ');
+        document.getElementById('employeeForm').reset();
+        fetchData();
+      } catch (err) {
+        showToast('ເກີດຂໍ້ຜິດພາດ', 'error');
+      } finally {
+        setLoading(false);
+      }
+    }
 
-    if (!name) { showToast('Please select an employee.', 'error'); return; }
-    if (!date) { showToast('Please select a date.', 'error');      return; }
+    async function deleteEmployee(id) {
+      if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບພະນັກງານຜູ້ນີ້?')) {
+        setLoading(true);
+        try {
+          await fetch(API, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({ action: 'deleteEmployee', id: id })
+          });
+          showToast('ລຶບພະນັກງານສໍາເລັດ');
+          fetchData();
+        } catch (err) {
+          showToast('ເກີດຂໍ້ຜິດພາດ', 'error');
+        } finally {
+          setLoading(false);
+        }
+      }
+    }
 
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const ok   = await postData({ action: 'saveAttendance', name, date, status, time });
-    if (ok) showToast(`Attendance saved for ${name}.`);
-  }
+    // -----------------------------------------------------------------
+    // RENDER INTERFACE LAYER
+    // -----------------------------------------------------------------
+    function loadEmpDropdown() {
+      const select = document.getElementById('empSelect');
+      if (!select) return;
+      select.innerHTML = '<option value="">-- ເລືອກພະນັກງານ --</option>' + 
+        employees.map(e => `<option value="${esc(e.name)}">${esc(e.name)}</option>`).join('');
+    }
 
-  async function deleteRecord(id) {
-    const ok = await postData({ action: 'deleteAttendance', id: String(id) });
-    if (ok) showToast('Record removed.');
-  }
+    function renderAll() {
+      const tbody = document.getElementById('attendanceBody');
+      if (!tbody) return;
 
-  function renderAll() {
-    const tbody  = document.getElementById('attBody');
-    const counts = { Present: 0, Absent: 0, Late: 0 };
-    records.forEach(r => counts[r.status]++);
+      let present = 0, absent = 0, late = 0;
 
-    document.getElementById('countPresent').textContent = counts.Present;
-    document.getElementById('countAbsent').textContent  = counts.Absent;
-    document.getElementById('countLate').textContent    = counts.Late;
-    document.getElementById('totalCount').textContent   =
-      records.length + (records.length === 1 ? ' record' : ' records');
+      if (!records || records.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">ບໍ່ມີຂໍ້ມູນການມາວຽກ</td></tr>`;
+        return;
+      }
 
-    if (records.length === 0) {
-      tbody.innerHTML = emptyState('📋', 'No records yet. Add an entry above to get started.', 6);
-    } else {
-      tbody.innerHTML = records.map((r, i) => `
+      tbody.innerHTML = records.map((r, i) => {
+        if (r.status === 'Present') present++;
+        if (r.status === 'Absent') absent++;
+        if (r.status === 'Late') late++;
+
+        let displayDate = '';
+        if (r.date) {
+          const d = new Date(r.date);
+          displayDate = !isNaN(d.getTime()) ? d.toLocaleDateString('lo-LA') : r.date;
+        }
+
+        return `
+          <tr>
+            <td>${records.length - i}</td>
+            <td>${esc(r.name)}</td>
+            <td>${displayDate}</td>
+            <td><span class="badge ${esc(r.status)}">${esc(r.status)}</span></td>
+            <td class="muted">${esc(r.time || '')}</td>
+            <td><button class="btn-del" onclick="deleteAttendance('${r.rowIndex}')">X</button></td>
+          </tr>`;
+      }).join('');
+
+      document.getElementById('countPresent').textContent = present;
+      document.getElementById('countAbsent').textContent = absent;
+      document.getElementById('countLate').textContent = late;
+    }
+
+    function renderEmployees() {
+      const tbody = document.getElementById('employeeBody');
+      if (!tbody) return;
+      
+      if (!employees || employees.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">ບໍ່ມີຂໍ້ມູນລາຍຊື່ພະນັກງານ</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = employees.map((emp, i) => `
         <tr>
-          <td class="muted">${records.length - i}</td>
-          <td class="name">${esc(r.name)}</td>
-          <td>${fmtDate(r.date)}</td>
-          <td><span class="badge ${esc(r.status)}">${esc(r.status)}</span></td>
-          <td class="muted">${esc(r.time || '')}</td>
-          <td><button class="btn-del" onclick="deleteRecord('${esc(String(r.id))}')" title="Remove">✕</button></td>
+          <td>${i + 1}</td>
+          <td>${esc(emp.id)}</td>
+          <td>${esc(emp.name)}</td>
+          <td>${esc(emp.dept || '')}</td>
+          <td><button class="btn-del" onclick="deleteEmployee('${esc(emp.id)}')">X</button></td>
         </tr>`).join('');
     }
 
-    populateYears();
-    renderSummary();
-  }
-
-  /* ════════════════════════════════════════
-     MONTHLY SUMMARY
-  ════════════════════════════════════════ */
-
-  function populateYears() {
-    const sel   = document.getElementById('sumYear');
-    const cur   = new Date().getFullYear();
-    const years = new Set(records.map(r => r.date && r.date.split('-')[0]).filter(Boolean));
-    years.add(String(cur));
-    const prev   = sel.value || String(cur);
-    const sorted = [...years].sort((a, b) => b - a);
-    sel.innerHTML = sorted.map(y =>
-      `<option value="${y}" ${y === prev ? 'selected' : ''}>${y}</option>`
-    ).join('');
-  }
-
-  function renderSummary() {
-    const month  = parseInt(document.getElementById('sumMonth').value);
-    const year   = parseInt(document.getElementById('sumYear').value);
-    const tbody  = document.getElementById('summaryBody');
-
-    const filtered = records.filter(r => {
-      if (!r.date) return false;
-      const [y, m] = r.date.split('-').map(Number);
-      return y === year && (m - 1) === month;
-    });
-
-    if (filtered.length === 0) {
-      tbody.innerHTML = emptyState('📊', 'No records found for this month.', 7);
-      return;
-    }
-
-    const map = {};
-    filtered.forEach(r => {
-      const key = r.name.trim().toLowerCase();
-      if (!map[key]) map[key] = { name: r.name.trim(), Present: 0, Absent: 0, Late: 0 };
-      map[key][r.status]++;
-    });
-
-    const rows = Object.values(map).sort((a, b) => a.name.localeCompare(b.name));
-    tbody.innerHTML = rows.map((e, i) => {
-      const total = e.Present + e.Absent + e.Late;
-      const pPct  = total ? (e.Present / total) * 100 : 0;
-      const aPct  = total ? (e.Absent  / total) * 100 : 0;
-      const lPct  = total ? (e.Late    / total) * 100 : 0;
-      return `
-        <tr>
-          <td class="muted">${i + 1}</td>
-          <td class="name">${esc(e.name)}</td>
-          <td class="num-present">${e.Present}</td>
-          <td class="num-absent">${e.Absent}</td>
-          <td class="num-late">${e.Late}</td>
-          <td class="num-total">${total}</td>
-          <td>
-            <div class="att-bar" title="Present ${Math.round(pPct)}% · Absent ${Math.round(aPct)}% · Late ${Math.round(lPct)}%">
-              <span class="bar-p" style="width:${pPct}%"></span>
-              <span class="bar-a" style="width:${aPct}%"></span>
-              <span class="bar-l" style="width:${lPct}%"></span>
-            </div>
-          </td>
-        </tr>`;
-    }).join('');
-  }
-
-  /* ════════════════════════════════════════
-     EMPLOYEE MANAGEMENT
-  ════════════════════════════════════════ */
-
-  async function saveEmployee() {
-    const name     = document.getElementById('empFullName').value.trim();
-    const phone    = document.getElementById('empPhone').value.trim();
-    const plate    = document.getElementById('empPlate').value.trim().toUpperCase();
-    const village  = document.getElementById('empVillage').value.trim();
-    const district = document.getElementById('empDistrict').value.trim();
-    const province = document.getElementById('empProvince').value.trim();
-
-    if (!name) { showToast('Full name is required.', 'error'); return; }
-
-    const ok = await postData({
-      action: 'registerEmployee',
-      name, phone, plate, village, district, province,
-      photo: pendingPhoto
-    });
-
-    if (ok) {
-      showToast(`${name} registered successfully.`);
-      clearEmpForm();
-    }
-  }
-
-  async function deleteEmployee(id) {
-    const ok = await postData({ action: 'deleteEmployee', id: String(id) });
-    if (ok) showToast('Employee removed.');
-  }
-
-  function renderEmployees() {
-    const tbody = document.getElementById('empBody');
-    document.getElementById('empCount').textContent =
-      employees.length + (employees.length === 1 ? ' employee' : ' employees');
-
-    if (employees.length === 0) {
-      tbody.innerHTML = emptyState('👥', 'No employees registered yet. Use the form above to add one.', 7);
-      return;
-    }
-
-    tbody.innerHTML = employees.map((e, i) => {
-      const avatar  = e.photo
-        ? `<img src="${esc(e.photo)}" class="emp-avatar" alt="${esc(e.name)}" />`
-        : `<div class="emp-avatar-ph">👤</div>`;
-      const address = [e.village, e.district, e.province].filter(Boolean).map(esc).join(', ') || '—';
-      const plate   = e.plate ? `<span class="plate-tag">${esc(e.plate)}</span>` : '—';
-      return `
-        <tr>
-          <td class="muted">${i + 1}</td>
-          <td class="avatar-col">${avatar}</td>
-          <td class="name">${esc(e.name)}</td>
-          <td style="color:#94a3b8">${esc(e.phone || '—')}</td>
-          <td style="font-size:0.82rem;color:#64748b">${address}</td>
-          <td>${plate}</td>
-          <td><button class="btn-del" onclick="deleteEmployee('${esc(String(e.id))}')" title="Remove">✕</button></td>
-        </tr>`;
-    }).join('');
-  }
-
-  function loadEmpDropdown() {
-    const sel = document.getElementById('empSelect');
-    if (employees.length === 0) {
-      sel.innerHTML = `<option value="">— No employees registered —</option>`;
-    } else {
-      sel.innerHTML = `<option value="">— Select Employee —</option>` +
-        employees.map(e => `<option value="${esc(e.name)}">${esc(e.name)}</option>`).join('');
-    }
-  }
-
-  /* ─── Photo upload — resize to max 240 px before storing ─── */
-  function handlePhotoUpload() {
-    const file = document.getElementById('photoInput').files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const img = new Image();
-      img.onload = () => {
-        const MAX = 240;
-        let w = img.width, h = img.height;
-        if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
-        else        { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        pendingPhoto = canvas.toDataURL('image/jpeg', 0.82);
-        document.getElementById('previewImg').src              = pendingPhoto;
-        document.getElementById('uploadPh').style.display      = 'none';
-        document.getElementById('uploadPreview').style.display = 'flex';
-      };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function clearEmpForm() {
-    ['empFullName','empPhone','empPlate','empVillage','empDistrict','empProvince']
-      .forEach(id => { document.getElementById(id).value = ''; });
-    pendingPhoto = '';
-    document.getElementById('photoInput').value              = '';
-    document.getElementById('previewImg').src                = '';
-    document.getElementById('uploadPh').style.display        = 'flex';
-    document.getElementById('uploadPreview').style.display   = 'none';
-  }
-
-  /* ─── UI helpers ─── */
-  function setLoading(state, label) {
-    _busy = state;
-    document.getElementById('loadingBar').classList.toggle('active', state);
-    document.querySelectorAll('button.btn-save, button.btn-primary, button.btn-del')
-      .forEach(b => { b.disabled = state; });
-    if (state && label) setSyncStatus('busy', label);
-  }
-
-  function setSyncStatus(type, text) {
-    const dot  = document.getElementById('syncDot');
-    const span = document.getElementById('syncText');
-    dot.className  = `sync-dot ${type}`;
-    if (text) {
-      span.textContent = text;
-    } else if (type === 'ok') {
-      const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      span.textContent = `Synced ${t}`;
-    }
-  }
-
-  function fmtDate(iso) {
-    if (!iso) return '—';
-    const [y, m, d] = iso.split('-');
-    return new Date(y, m - 1, d).toLocaleDateString('en-US',
-      { year: 'numeric', month: 'short', day: 'numeric' });
-  }
-
-  function esc(s) {
-    return String(s)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  function emptyState(icon, text, cols) {
-    return `<tr><td colspan="${cols}">
-      <div class="empty">
-        <div class="empty-icon">${icon}</div>
-        <p>${text}</p>
-      </div></td></tr>`;
-  }
-
-  function showToast(msg, type) {
-    const t = document.getElementById('toast');
-    t.textContent       = msg;
-    t.style.borderColor = type === 'error' ? '#ef444444' : '#22c55e44';
-    t.style.color       = type === 'error' ? '#ef4444'   : '#22c55e';
-    t.classList.add('show');
-    clearTimeout(t._t);
-    t._t = setTimeout(() => t.classList.remove('show'), 2800);
-  }
-</script>
+    // ONLOAD INITIALIZATION
+    window.onload = fetchData;
+  </script>
 </body>
 </html>
-
